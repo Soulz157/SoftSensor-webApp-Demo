@@ -3,23 +3,20 @@
 import { useState } from "react";
 import {
   LayoutDashboard,
-  FolderKanban,
-  Activity,
   Settings,
   HelpCircle,
   ChevronDown,
-  Plus,
-  Layers,
-  Radio,
+  Building2,
+  Box,
   BarChart3,
+  ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface WorkspaceItem {
+interface Workspace {
   id: string;
   name: string;
-  icon: React.ReactNode;
-  active?: boolean;
+  modelsCount: number;
 }
 
 interface NavItem {
@@ -29,18 +26,10 @@ interface NavItem {
   badge?: number;
 }
 
-const workspaces: WorkspaceItem[] = [
-  { id: "1", name: "Production", icon: <Radio className="h-4 w-4" />, active: true },
-  { id: "2", name: "Development", icon: <Layers className="h-4 w-4" /> },
-  { id: "3", name: "Staging", icon: <Activity className="h-4 w-4" /> },
-];
-
-const navItems: NavItem[] = [
-  { id: "dashboard", name: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
-  { id: "projects", name: "Projects", icon: <FolderKanban className="h-4 w-4" />, badge: 12 },
-  { id: "sensors", name: "Sensors", icon: <Radio className="h-4 w-4" />, badge: 48 },
-  { id: "analytics", name: "Analytics", icon: <BarChart3 className="h-4 w-4" /> },
-  { id: "settings", name: "Settings", icon: <Settings className="h-4 w-4" /> },
+const workspaces: Workspace[] = [
+  { id: "1", name: "Acme Corporation", modelsCount: 24 },
+  { id: "2", name: "TechFlow Inc", modelsCount: 56 },
+  { id: "3", name: "DataSense Ltd", modelsCount: 12 },
 ];
 
 export function Sidebar() {
@@ -48,12 +37,21 @@ export function Sidebar() {
   const [workspaceOpen, setWorkspaceOpen] = useState(true);
   const [activeWorkspace, setActiveWorkspace] = useState("1");
 
+  const currentWorkspace = workspaces.find((w) => w.id === activeWorkspace);
+
+  const navItems: NavItem[] = [
+    { id: "dashboard", name: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
+    { id: "models", name: "Models", icon: <Box className="h-4 w-4" />, badge: currentWorkspace?.modelsCount },
+    { id: "analytics", name: "Analytics", icon: <BarChart3 className="h-4 w-4" /> },
+    { id: "settings", name: "Settings", icon: <Settings className="h-4 w-4" /> },
+  ];
+
   return (
     <aside className="flex h-screen w-64 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border">
       {/* Logo */}
       <div className="flex items-center gap-3 px-5 py-5 border-b border-sidebar-border">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-          <Activity className="h-4 w-4 text-primary-foreground" />
+          <Box className="h-4 w-4 text-primary-foreground" />
         </div>
         <span className="text-lg font-semibold tracking-tight">SoftSensor</span>
       </div>
@@ -64,10 +62,10 @@ export function Sidebar() {
           onClick={() => setWorkspaceOpen(!workspaceOpen)}
           className="flex w-full items-center justify-between rounded-md px-3 py-2 text-xs font-medium uppercase tracking-wider text-sidebar-foreground/60 hover:text-sidebar-foreground transition-colors"
         >
-          Workspace
+          Workspaces
           <ChevronDown
             className={cn(
-              "h-4 w-4 transition-transform",
+              "h-4 w-4 transition-transform duration-200",
               workspaceOpen && "rotate-180"
             )}
           />
@@ -80,29 +78,31 @@ export function Sidebar() {
                 key={workspace.id}
                 onClick={() => setActiveWorkspace(workspace.id)}
                 className={cn(
-                  "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
+                  "group flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm transition-colors",
                   activeWorkspace === workspace.id
                     ? "bg-sidebar-accent text-sidebar-accent-foreground"
                     : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
                 )}
               >
-                {workspace.icon}
-                {workspace.name}
+                <Building2 className="h-4 w-4 shrink-0" />
+                <span className="flex-1 truncate text-left">{workspace.name}</span>
+                <span className="text-xs text-sidebar-foreground/50">
+                  {workspace.modelsCount}
+                </span>
                 {activeWorkspace === workspace.id && (
-                  <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />
+                  <ChevronRight className="h-3 w-3 text-primary" />
                 )}
               </button>
             ))}
-            <button className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-sidebar-foreground/50 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-colors">
-              <Plus className="h-4 w-4" />
-              Add Workspace
-            </button>
           </div>
         )}
       </div>
 
+      {/* Divider */}
+      <div className="mx-3 border-t border-sidebar-border" />
+
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-2">
+      <nav className="flex-1 px-3 py-4">
         <div className="space-y-1">
           {navItems.map((item) => (
             <button
@@ -117,7 +117,7 @@ export function Sidebar() {
             >
               {item.icon}
               {item.name}
-              {item.badge && (
+              {item.badge !== undefined && (
                 <span
                   className={cn(
                     "ml-auto rounded-full px-2 py-0.5 text-xs",
@@ -133,6 +133,27 @@ export function Sidebar() {
           ))}
         </div>
       </nav>
+
+      {/* Current Workspace Info */}
+      {currentWorkspace && (
+        <div className="mx-3 mb-3 rounded-lg bg-sidebar-accent/50 p-3">
+          <div className="flex items-center gap-2 mb-1">
+            <Building2 className="h-3.5 w-3.5 text-primary" />
+            <span className="text-xs font-medium text-sidebar-foreground">
+              {currentWorkspace.name}
+            </span>
+          </div>
+          <div className="text-xs text-sidebar-foreground/60">
+            {currentWorkspace.modelsCount} / 100 models
+          </div>
+          <div className="mt-2 h-1.5 w-full rounded-full bg-sidebar-border">
+            <div
+              className="h-full rounded-full bg-primary transition-all"
+              style={{ width: `${(currentWorkspace.modelsCount / 100) * 100}%` }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <div className="border-t border-sidebar-border px-3 py-4">

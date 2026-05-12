@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Sidebar } from "@/components/sidebar";
 import { Header } from "@/components/header";
 import { DashboardContent } from "@/components/dashboard-content";
-import { CreateProjectDialog } from "@/components/create-project-dialog";
+import { CreateWorkspaceDialog } from "@/components/create-project-dialog";
 
 export default function Home() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -17,14 +17,14 @@ export default function Home() {
       {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Header */}
-        <Header onCreateProject={() => setCreateDialogOpen(true)} />
+        <Header onCreateWorkspace={() => setCreateDialogOpen(true)} />
 
         {/* Dashboard Content */}
         <DashboardContent />
       </div>
 
-      {/* Create Project Dialog */}
-      <CreateProjectDialog
+      {/* Create Workspace Dialog */}
+      <CreateWorkspaceDialog
         open={createDialogOpen}
         onClose={() => setCreateDialogOpen(false)}
       />
