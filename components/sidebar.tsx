@@ -91,10 +91,10 @@ export function Sidebar({
           "w-64"
         )}
       >
-        {/* Logo */}
+        {/* Logo & Collapse Toggle */}
         <div className={cn(
           "flex items-center border-b border-sidebar-border transition-all",
-          isCollapsed ? "justify-center px-2 py-5" : "justify-between px-5 py-5"
+          isCollapsed ? "justify-center px-2 py-4" : "justify-between px-4 py-4"
         )}>
           <div className={cn(
             "flex items-center gap-3",
@@ -110,35 +110,40 @@ export function Sidebar({
               SoftSensor
             </span>
           </div>
+          
+          {/* Desktop collapse toggle */}
+          <button
+            onClick={onToggleCollapse}
+            className={cn(
+              "hidden lg:flex h-8 w-8 items-center justify-center rounded-md text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors",
+              isCollapsed && "lg:hidden"
+            )}
+            title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            <PanelLeftClose className="h-4 w-4" />
+          </button>
+          
           {/* Mobile close button */}
           <button
             onClick={onClose}
-            className={cn(
-              "flex h-8 w-8 items-center justify-center rounded-md text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors lg:hidden",
-              isCollapsed && "hidden"
-            )}
+            className="flex h-8 w-8 items-center justify-center rounded-md text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors lg:hidden"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        {/* Collapse Toggle Button - Desktop only */}
-        <div className={cn(
-          "hidden lg:flex px-3 py-2",
-          isCollapsed ? "justify-center" : "justify-end"
-        )}>
-          <button
-            onClick={onToggleCollapse}
-            className="flex h-8 w-8 items-center justify-center rounded-md text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors"
-            title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            {isCollapsed ? (
+        {/* Collapsed state: expand button at top */}
+        {isCollapsed && (
+          <div className="hidden lg:flex justify-center py-3">
+            <button
+              onClick={onToggleCollapse}
+              className="flex h-8 w-8 items-center justify-center rounded-md text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors"
+              title="Expand sidebar"
+            >
               <PanelLeft className="h-4 w-4" />
-            ) : (
-              <PanelLeftClose className="h-4 w-4" />
-            )}
-          </button>
-        </div>
+            </button>
+          </div>
+        )}
 
         {/* Workspace Section */}
         <div className={cn("py-2", isCollapsed ? "px-2" : "px-3")}>
