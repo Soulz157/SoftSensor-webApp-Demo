@@ -14,7 +14,6 @@ import {
   User,
   Building2,
   ArrowRight,
-  Check,
 } from "lucide-react";
 
 export default function RegisterPage() {
@@ -29,9 +28,9 @@ export default function RegisterPage() {
   });
 
   const passwordRequirements = [
-    { label: "At least 8 characters", met: formData.password.length >= 8 },
-    { label: "One uppercase letter", met: /[A-Z]/.test(formData.password) },
-    { label: "One number", met: /[0-9]/.test(formData.password) },
+    { label: "8+ chars", met: formData.password.length >= 8 },
+    { label: "Uppercase", met: /[A-Z]/.test(formData.password) },
+    { label: "Number", met: /[0-9]/.test(formData.password) },
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,81 +43,25 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-screen">
-      {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-sidebar flex-col justify-between p-12">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-            <Activity className="h-5 w-5 text-primary-foreground" />
+    <div className="flex min-h-screen items-center justify-center bg-background p-6">
+      <div className="w-full max-w-md space-y-8">
+        {/* Logo */}
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
+            <Activity className="h-6 w-6 text-primary-foreground" />
           </div>
-          <span className="text-xl font-semibold text-sidebar-foreground">
-            SoftSensor
-          </span>
-        </div>
-
-        <div className="space-y-6">
-          <h1 className="text-4xl font-bold leading-tight text-sidebar-foreground text-balance">
-            Start Your Monitoring Journey
-          </h1>
-          <p className="text-lg text-sidebar-foreground/70 leading-relaxed max-w-md">
-            Create your workspace and import up to 100 models. Get started with
-            powerful analytics and real-time monitoring.
-          </p>
-          <div className="space-y-4 pt-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20">
-                <Check className="h-4 w-4 text-primary" />
-              </div>
-              <span className="text-sidebar-foreground/80">
-                Free 14-day trial
-              </span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20">
-                <Check className="h-4 w-4 text-primary" />
-              </div>
-              <span className="text-sidebar-foreground/80">
-                No credit card required
-              </span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20">
-                <Check className="h-4 w-4 text-primary" />
-              </div>
-              <span className="text-sidebar-foreground/80">
-                Up to 100 models per workspace
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="text-sm text-sidebar-foreground/50">
-          2024 SoftSensor. All rights reserved.
-        </div>
-      </div>
-
-      {/* Right Side - Register Form */}
-      <div className="flex w-full lg:w-1/2 items-center justify-center p-8">
-        <div className="w-full max-w-md space-y-8">
-          {/* Mobile Logo */}
-          <div className="flex lg:hidden items-center justify-center gap-3 mb-8">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-              <Activity className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-semibold text-foreground">
-              SoftSensor
-            </span>
-          </div>
-
-          <div className="space-y-2 text-center lg:text-left">
-            <h2 className="text-2xl font-semibold text-foreground">
+          <div className="text-center">
+            <h1 className="text-2xl font-semibold text-foreground">
               Create your account
-            </h2>
-            <p className="text-muted-foreground">
-              Get started with your free trial today
+            </h1>
+            <p className="mt-1 text-muted-foreground">
+              Get started with SoftSensor today
             </p>
           </div>
+        </div>
 
+        {/* Form Card */}
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">
@@ -206,11 +149,11 @@ export default function RegisterPage() {
                 </button>
               </div>
               {formData.password && (
-                <div className="flex gap-4 pt-1">
+                <div className="flex gap-3 pt-1">
                   {passwordRequirements.map((req, i) => (
                     <div
                       key={i}
-                      className={`flex items-center gap-1 text-xs ${
+                      className={`flex items-center gap-1.5 text-xs ${
                         req.met ? "text-primary" : "text-muted-foreground"
                       }`}
                     >
@@ -245,13 +188,13 @@ export default function RegisterPage() {
             </Button>
           </form>
 
-          <p className="text-center text-xs text-muted-foreground">
+          <p className="text-center text-xs text-muted-foreground mt-4">
             By creating an account, you agree to our{" "}
             <Link
               href="#"
               className="text-primary hover:text-primary/80 transition-colors"
             >
-              Terms of Service
+              Terms
             </Link>{" "}
             and{" "}
             <Link
@@ -262,12 +205,12 @@ export default function RegisterPage() {
             </Link>
           </p>
 
-          <div className="relative">
+          <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
+              <span className="bg-card px-2 text-muted-foreground">
                 Or continue with
               </span>
             </div>
@@ -312,17 +255,17 @@ export default function RegisterPage() {
               GitHub
             </Button>
           </div>
-
-          <p className="text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
-            <Link
-              href="/login"
-              className="text-primary hover:text-primary/80 font-medium transition-colors"
-            >
-              Sign in
-            </Link>
-          </p>
         </div>
+
+        <p className="text-center text-sm text-muted-foreground">
+          Already have an account?{" "}
+          <Link
+            href="/login"
+            className="text-primary hover:text-primary/80 font-medium transition-colors"
+          >
+            Sign in
+          </Link>
+        </p>
       </div>
     </div>
   );

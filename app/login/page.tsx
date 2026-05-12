@@ -26,71 +26,25 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen">
-      {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-sidebar flex-col justify-between p-12">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-            <Activity className="h-5 w-5 text-primary-foreground" />
+    <div className="flex min-h-screen items-center justify-center bg-background p-6">
+      <div className="w-full max-w-md space-y-8">
+        {/* Logo */}
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
+            <Activity className="h-6 w-6 text-primary-foreground" />
           </div>
-          <span className="text-xl font-semibold text-sidebar-foreground">
-            SoftSensor
-          </span>
-        </div>
-
-        <div className="space-y-6">
-          <h1 className="text-4xl font-bold leading-tight text-sidebar-foreground text-balance">
-            Smart Monitoring for Modern Business
-          </h1>
-          <p className="text-lg text-sidebar-foreground/70 leading-relaxed max-w-md">
-            Import up to 100 models per workspace. Monitor, analyze, and
-            optimize your sensor data in real-time.
-          </p>
-          <div className="flex gap-8 pt-4">
-            <div>
-              <div className="text-3xl font-bold text-primary">500+</div>
-              <div className="text-sm text-sidebar-foreground/60">
-                Companies
-              </div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-primary">10K+</div>
-              <div className="text-sm text-sidebar-foreground/60">Models</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-primary">99.9%</div>
-              <div className="text-sm text-sidebar-foreground/60">Uptime</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="text-sm text-sidebar-foreground/50">
-          2024 SoftSensor. All rights reserved.
-        </div>
-      </div>
-
-      {/* Right Side - Login Form */}
-      <div className="flex w-full lg:w-1/2 items-center justify-center p-8">
-        <div className="w-full max-w-md space-y-8">
-          {/* Mobile Logo */}
-          <div className="flex lg:hidden items-center justify-center gap-3 mb-8">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-              <Activity className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-semibold text-foreground">
-              SoftSensor
-            </span>
-          </div>
-
-          <div className="space-y-2 text-center lg:text-left">
-            <h2 className="text-2xl font-semibold text-foreground">
+          <div className="text-center">
+            <h1 className="text-2xl font-semibold text-foreground">
               Welcome back
-            </h2>
-            <p className="text-muted-foreground">
-              Enter your credentials to access your account
+            </h1>
+            <p className="mt-1 text-muted-foreground">
+              Sign in to your SoftSensor account
             </p>
           </div>
+        </div>
 
+        {/* Form Card */}
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">
@@ -168,12 +122,12 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="relative">
+          <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
+              <span className="bg-card px-2 text-muted-foreground">
                 Or continue with
               </span>
             </div>
@@ -214,17 +168,17 @@ export default function LoginPage() {
               GitHub
             </Button>
           </div>
-
-          <p className="text-center text-sm text-muted-foreground">
-            {"Don't have an account? "}
-            <Link
-              href="/register"
-              className="text-primary hover:text-primary/80 font-medium transition-colors"
-            >
-              Create account
-            </Link>
-          </p>
         </div>
+
+        <p className="text-center text-sm text-muted-foreground">
+          {"Don't have an account? "}
+          <Link
+            href="/register"
+            className="text-primary hover:text-primary/80 font-medium transition-colors"
+          >
+            Create account
+          </Link>
+        </p>
       </div>
     </div>
   );
