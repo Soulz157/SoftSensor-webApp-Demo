@@ -14,3 +14,6 @@ node_modules
 .next/
 .DS_Store
 tsconfig.tsbuildinfo
+
+# Claude Code hook logs
+.claude/logs/
