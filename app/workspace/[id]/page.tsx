@@ -1,24 +1,38 @@
 "use client";
 
 import { useState, use } from "react";
+import Link from "next/link";
 import { AppLayout } from "@/components/app-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { 
-  Box, 
-  X, 
-  Cpu, 
-  Activity, 
-  Thermometer, 
-  Gauge, 
-  ZoomIn, 
-  ZoomOut, 
+import {
+  Box,
+  X,
+  Cpu,
+  Thermometer,
+  Gauge,
+  ZoomIn,
+  ZoomOut,
   RotateCcw,
   Maximize2,
   CheckCircle2,
   AlertTriangle,
-  XCircle
+  XCircle,
+  Pencil,
+  Trash2,
+  Plus,
+  Wrench,
+  ArrowRight,
+  ChevronRight,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 interface Node {
   id: string;
@@ -47,8 +61,8 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         y: 20,
         status: "online",
         models: [
-          { id: "m1", name: "Temperature Predictor", status: "running", accuracy: "94.2%" },
-          { id: "m2", name: "Vibration Analyzer", status: "running", accuracy: "91.5%" },
+          { id: "1", name: "Temperature Predictor", status: "running", accuracy: "94.2%" },
+          { id: "6", name: "Vibration Analyzer", status: "running", accuracy: "91.5%" },
         ],
       },
       {
@@ -59,7 +73,7 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         y: 25,
         status: "online",
         models: [
-          { id: "m3", name: "Quality Classifier", status: "running", accuracy: "96.1%" },
+          { id: "4", name: "Quality Classifier", status: "running", accuracy: "96.1%" },
         ],
       },
       {
@@ -71,7 +85,7 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         status: "warning",
         models: [
           { id: "m4", name: "Speed Optimizer", status: "error", accuracy: "87.3%" },
-          { id: "m5", name: "Load Predictor", status: "running", accuracy: "89.8%" },
+          { id: "5", name: "Energy Optimizer", status: "running", accuracy: "89.8%" },
         ],
       },
       {
@@ -82,7 +96,7 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         y: 55,
         status: "online",
         models: [
-          { id: "m6", name: "Anomaly Detector", status: "running", accuracy: "92.4%" },
+          { id: "3", name: "Anomaly Detector", status: "running", accuracy: "92.4%" },
         ],
       },
       {
@@ -102,9 +116,9 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         y: 80,
         status: "online",
         models: [
-          { id: "m7", name: "Energy Optimizer", status: "running", accuracy: "93.7%" },
-          { id: "m8", name: "Demand Forecaster", status: "running", accuracy: "91.8%" },
-          { id: "m9", name: "Maintenance Predictor", status: "stopped" },
+          { id: "5", name: "Energy Optimizer", status: "running", accuracy: "93.7%" },
+          { id: "2", name: "Demand Forecaster", status: "running", accuracy: "91.8%" },
+          { id: "12", name: "Maintenance Predictor", status: "stopped" },
         ],
       },
     ],
@@ -120,7 +134,7 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         y: 25,
         status: "online",
         models: [
-          { id: "m1", name: "Load Balancer AI", status: "running", accuracy: "97.2%" },
+          { id: "7", name: "Load Balancer AI", status: "running", accuracy: "97.2%" },
         ],
       },
       {
@@ -131,7 +145,7 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         y: 30,
         status: "warning",
         models: [
-          { id: "m2", name: "Cooling Optimizer", status: "running", accuracy: "88.5%" },
+          { id: "8", name: "Cooling Optimizer", status: "running", accuracy: "88.5%" },
         ],
       },
       {
@@ -142,7 +156,7 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         y: 70,
         status: "online",
         models: [
-          { id: "m3", name: "Traffic Analyzer", status: "running", accuracy: "95.1%" },
+          { id: "9", name: "Traffic Analyzer", status: "running", accuracy: "95.1%" },
         ],
       },
     ],
@@ -158,7 +172,7 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         y: 35,
         status: "offline",
         models: [
-          { id: "m1", name: "Data Classifier", status: "stopped" },
+          { id: "10", name: "Data Classifier", status: "stopped" },
         ],
       },
       {
@@ -169,7 +183,7 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         y: 40,
         status: "online",
         models: [
-          { id: "m2", name: "Compression AI", status: "running", accuracy: "94.8%" },
+          { id: "11", name: "Compression AI", status: "running", accuracy: "94.8%" },
         ],
       },
     ],
@@ -178,10 +192,114 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
 
 export default function WorkspacePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const workspaceBase = workspaceData[id] || workspaceData["1"];
+
+  const [nodes, setNodes] = useState<Node[]>(workspaceBase.nodes);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [zoom, setZoom] = useState(1);
+  const [buildMode, setBuildMode] = useState(false);
 
-  const workspace = workspaceData[id] || workspaceData["1"];
+  const [editingNode, setEditingNode] = useState<Node | null>(null);
+  const [editForm, setEditForm] = useState<{
+    name: string;
+    type: Node["type"];
+    status: Node["status"];
+  }>({ name: "", type: "machine", status: "online" });
+
+  const [deletingNode, setDeletingNode] = useState<Node | null>(null);
+
+  const [addingNode, setAddingNode] = useState(false);
+  const [addNodeForm, setAddNodeForm] = useState<{
+    name: string;
+    type: Node["type"];
+  }>({ name: "", type: "machine" });
+
+  const [showModelActions, setShowModelActions] = useState(false);
+
+  const [addModelDialog, setAddModelDialog] = useState(false);
+  const [addModelForm, setAddModelForm] = useState({ nodeId: "", modelName: "" });
+
+  const openEditNode = (node: Node, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditForm({ name: node.name, type: node.type, status: node.status });
+    setEditingNode(node);
+  };
+
+  const saveEditNode = () => {
+    if (!editingNode) return;
+    const updated = nodes.map((n) =>
+      n.id === editingNode.id ? { ...n, ...editForm } : n
+    );
+    setNodes(updated);
+    if (selectedNode?.id === editingNode.id) {
+      setSelectedNode({ ...editingNode, ...editForm });
+    }
+    setEditingNode(null);
+  };
+
+  const openDeleteNode = (node: Node, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDeletingNode(node);
+  };
+
+  const confirmDeleteNode = () => {
+    if (!deletingNode) return;
+    setNodes(nodes.filter((n) => n.id !== deletingNode.id));
+    if (selectedNode?.id === deletingNode.id) setSelectedNode(null);
+    setDeletingNode(null);
+  };
+
+  const saveAddNode = () => {
+    if (!addNodeForm.name.trim()) return;
+    const newNode: Node = {
+      id: `n${Date.now()}`,
+      name: addNodeForm.name,
+      type: addNodeForm.type,
+      x: Math.floor(Math.random() * 55) + 20,
+      y: Math.floor(Math.random() * 55) + 20,
+      status: "online",
+      models: [],
+    };
+    setNodes([...nodes, newNode]);
+    setAddingNode(false);
+    setAddNodeForm({ name: "", type: "machine" });
+  };
+
+  const saveAddModel = () => {
+    if (!addModelForm.nodeId || !addModelForm.modelName.trim()) return;
+    setNodes(
+      nodes.map((n) =>
+        n.id === addModelForm.nodeId
+          ? {
+              ...n,
+              models: [
+                ...n.models,
+                {
+                  id: `m${Date.now()}`,
+                  name: addModelForm.modelName,
+                  status: "stopped" as const,
+                },
+              ],
+            }
+          : n
+      )
+    );
+    if (selectedNode?.id === addModelForm.nodeId) {
+      const target = nodes.find((n) => n.id === addModelForm.nodeId);
+      if (target) {
+        setSelectedNode({
+          ...target,
+          models: [
+            ...target.models,
+            { id: `m${Date.now()}`, name: addModelForm.modelName, status: "stopped" },
+          ],
+        });
+      }
+    }
+    setAddModelDialog(false);
+    setAddModelForm({ nodeId: "", modelName: "" });
+    setShowModelActions(false);
+  };
 
   const getNodeIcon = (type: Node["type"]) => {
     switch (type) {
@@ -216,20 +334,49 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
     }
   };
 
+  const inputClass =
+    "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring";
+
   return (
     <AppLayout>
       <div className="flex flex-1 overflow-hidden">
-        {/* 3D Visualization Area */}
+        {/* Canvas Area */}
         <div className="flex-1 flex flex-col">
           {/* Toolbar */}
-          <div className="flex items-center justify-between border-b border-border bg-card px-4 py-2">
+          <div
+            className={`flex items-center justify-between border-b border-border px-4 py-2 transition-colors ${
+              buildMode ? "bg-amber-500/10 border-amber-500/30" : "bg-card"
+            }`}
+          >
             <div>
-              <h1 className="text-lg font-semibold text-foreground">{workspace.name}</h1>
+              <h1 className="text-lg font-semibold text-foreground">{workspaceBase.name}</h1>
               <p className="text-xs text-muted-foreground">
-                {workspace.nodes.length} nodes - Click on a node to view details
+                {nodes.length} nodes{buildMode ? " — Build Mode active" : " — Click a node to view details"}
               </p>
             </div>
             <div className="flex items-center gap-1">
+              <Button
+                variant={buildMode ? "default" : "outline"}
+                size="sm"
+                onClick={() => setBuildMode(!buildMode)}
+                className={`gap-1.5 mr-2 ${buildMode ? "bg-amber-500 hover:bg-amber-600 text-white border-transparent" : ""}`}
+              >
+                <Wrench className="h-3.5 w-3.5" />
+                {buildMode ? "Exit Build Mode" : "Build Mode"}
+              </Button>
+
+              {buildMode && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setAddingNode(true)}
+                  className="gap-1.5 mr-2 border-dashed"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Add Node
+                </Button>
+              )}
+
               <Button
                 variant="ghost"
                 size="icon"
@@ -246,12 +393,7 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
               >
                 <ZoomOut className="h-4 w-4" />
               </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setZoom(1)}
-                title="Reset View"
-              >
+              <Button variant="ghost" size="icon" onClick={() => setZoom(1)} title="Reset View">
                 <RotateCcw className="h-4 w-4" />
               </Button>
               <Button variant="ghost" size="icon" title="Fullscreen">
@@ -260,10 +402,9 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
             </div>
           </div>
 
-          {/* Visualization Canvas */}
+          {/* Canvas */}
           <div className="flex-1 relative overflow-hidden bg-muted/30">
-            {/* Grid Background */}
-            <div 
+            <div
               className="absolute inset-0"
               style={{
                 backgroundImage: `
@@ -274,12 +415,10 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
               }}
             />
 
-            {/* Floor Plan / Factory Layout Representation */}
-            <div 
+            <div
               className="absolute inset-4 border-2 border-dashed border-border/50 rounded-lg"
               style={{ transform: `scale(${zoom})`, transformOrigin: "center" }}
             >
-              {/* Connection Lines */}
               <svg className="absolute inset-0 w-full h-full pointer-events-none">
                 <defs>
                   <marker
@@ -290,16 +429,12 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
                     refY="3.5"
                     orient="auto"
                   >
-                    <polygon
-                      points="0 0, 10 3.5, 0 7"
-                      className="fill-primary/30"
-                    />
+                    <polygon points="0 0, 10 3.5, 0 7" className="fill-primary/30" />
                   </marker>
                 </defs>
-                {/* Draw connections between nodes */}
-                {workspace.nodes.map((node, i) => {
-                  if (i === workspace.nodes.length - 1) return null;
-                  const nextNode = workspace.nodes[i + 1];
+                {nodes.map((node, i) => {
+                  if (i === nodes.length - 1) return null;
+                  const nextNode = nodes[i + 1];
                   return (
                     <line
                       key={`line-${node.id}`}
@@ -315,75 +450,153 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
                 })}
               </svg>
 
-              {/* Nodes */}
-              {workspace.nodes.map((node) => (
-                <button
+              {nodes.map((node) => (
+                <div
                   key={node.id}
-                  onClick={() => setSelectedNode(node)}
-                  className={`absolute flex flex-col items-center gap-1 p-2 rounded-lg transition-all hover:scale-110 ${
-                    selectedNode?.id === node.id
-                      ? "bg-primary/20 ring-2 ring-primary"
-                      : "bg-card hover:bg-accent"
-                  } border border-border shadow-lg`}
+                  className="absolute"
                   style={{
                     left: `${node.x}%`,
                     top: `${node.y}%`,
                     transform: "translate(-50%, -50%)",
                   }}
                 >
-                  <div className="relative">
-                    <div className={`p-2 rounded-md ${
-                      node.status === "online" ? "bg-primary/10 text-primary" :
-                      node.status === "warning" ? "bg-amber-500/10 text-amber-500" :
-                      "bg-red-500/10 text-red-500"
-                    }`}>
-                      {getNodeIcon(node.type)}
+                  <button
+                    onClick={() => !buildMode && setSelectedNode(node)}
+                    className={`relative flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
+                      !buildMode ? "hover:scale-110" : ""
+                    } ${
+                      selectedNode?.id === node.id
+                        ? "bg-primary/20 ring-2 ring-primary"
+                        : buildMode
+                        ? "bg-card ring-2 ring-amber-500/40"
+                        : "bg-card hover:bg-accent"
+                    } border border-border shadow-lg`}
+                  >
+                    <div className="relative">
+                      <div
+                        className={`p-2 rounded-md ${
+                          node.status === "online"
+                            ? "bg-primary/10 text-primary"
+                            : node.status === "warning"
+                            ? "bg-amber-500/10 text-amber-500"
+                            : "bg-red-500/10 text-red-500"
+                        }`}
+                      >
+                        {getNodeIcon(node.type)}
+                      </div>
+                      <span
+                        className={`absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full ${getStatusColor(node.status)} ring-2 ring-card`}
+                      />
                     </div>
-                    <span className={`absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full ${getStatusColor(node.status)} ring-2 ring-card`} />
-                  </div>
-                  <span className="text-[10px] font-medium text-foreground whitespace-nowrap max-w-20 truncate">
-                    {node.name}
-                  </span>
-                  {node.models.length > 0 && (
-                    <span className="text-[9px] text-muted-foreground">
-                      {node.models.length} model{node.models.length > 1 ? "s" : ""}
+                    <span className="text-[10px] font-medium text-foreground whitespace-nowrap max-w-20 truncate">
+                      {node.name}
                     </span>
+                    {node.models.length > 0 && (
+                      <span className="text-[9px] text-muted-foreground">
+                        {node.models.length} model{node.models.length > 1 ? "s" : ""}
+                      </span>
+                    )}
+                  </button>
+
+                  {buildMode && (
+                    <div className="absolute -top-3 -right-3 flex gap-1">
+                      <button
+                        onClick={(e) => openEditNode(node, e)}
+                        className="h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow hover:bg-primary/80 transition-colors"
+                        title="Edit node"
+                      >
+                        <Pencil className="h-3 w-3" />
+                      </button>
+                      <button
+                        onClick={(e) => openDeleteNode(node, e)}
+                        className="h-6 w-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center shadow hover:bg-destructive/80 transition-colors"
+                        title="Delete node"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    </div>
                   )}
-                </button>
+                </div>
               ))}
             </div>
 
-            {/* Legend */}
-            <div className="absolute bottom-4 left-4 bg-card/95 backdrop-blur-sm rounded-lg border border-border p-3 shadow-lg">
-              <p className="text-xs font-medium text-foreground mb-2">Legend</p>
-              <div className="space-y-1.5">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                  Online
-                </div>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span className="h-2 w-2 rounded-full bg-amber-500" />
-                  Warning
-                </div>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span className="h-2 w-2 rounded-full bg-red-500" />
-                  Offline
-                </div>
+            {/* Bottom-left Interactive Box */}
+            <div className="absolute bottom-4 left-4 z-10">
+              <div className="bg-card/95 backdrop-blur-sm rounded-lg border border-border shadow-lg overflow-hidden">
+                <button
+                  onClick={() => setShowModelActions(!showModelActions)}
+                  className="flex items-center justify-between w-full px-3 py-2 hover:bg-accent/50 transition-colors"
+                >
+                  <p className="text-xs font-medium text-foreground">
+                    {showModelActions ? "Actions" : "Legend"}
+                  </p>
+                  <ChevronRight
+                    className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${
+                      showModelActions ? "rotate-90" : ""
+                    }`}
+                  />
+                </button>
+
+                {!showModelActions && (
+                  <div className="px-3 pb-3 space-y-1.5">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                      Online
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span className="h-2 w-2 rounded-full bg-amber-500" />
+                      Warning
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span className="h-2 w-2 rounded-full bg-red-500" />
+                      Offline
+                    </div>
+                  </div>
+                )}
+
+                {showModelActions && (
+                  <div className="px-3 pb-3 space-y-2">
+                    <button
+                      onClick={() => {
+                        setAddModelForm({ nodeId: nodes[0]?.id ?? "", modelName: "" });
+                        setAddModelDialog(true);
+                      }}
+                      className="flex items-center gap-2 w-full rounded-md px-2 py-1.5 text-xs font-medium text-foreground bg-primary/10 hover:bg-primary/20 transition-colors"
+                    >
+                      <Plus className="h-3.5 w-3.5 text-primary" />
+                      Add Model to Node
+                    </button>
+                    <button
+                      onClick={() => {
+                        setBuildMode(true);
+                        setShowModelActions(false);
+                      }}
+                      className="flex items-center gap-2 w-full rounded-md px-2 py-1.5 text-xs font-medium text-foreground bg-amber-500/10 hover:bg-amber-500/20 transition-colors"
+                    >
+                      <Wrench className="h-3.5 w-3.5 text-amber-500" />
+                      Enter Build Mode
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
 
         {/* Node Details Panel */}
-        {selectedNode && (
+        {selectedNode && !buildMode && (
           <div className="w-80 border-l border-border bg-card flex flex-col">
             <div className="flex items-center justify-between p-4 border-b border-border">
               <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-md ${
-                  selectedNode.status === "online" ? "bg-primary/10 text-primary" :
-                  selectedNode.status === "warning" ? "bg-amber-500/10 text-amber-500" :
-                  "bg-red-500/10 text-red-500"
-                }`}>
+                <div
+                  className={`p-2 rounded-md ${
+                    selectedNode.status === "online"
+                      ? "bg-primary/10 text-primary"
+                      : selectedNode.status === "warning"
+                      ? "bg-amber-500/10 text-amber-500"
+                      : "bg-red-500/10 text-red-500"
+                  }`}
+                >
                   {getNodeIcon(selectedNode.type)}
                 </div>
                 <div>
@@ -397,7 +610,6 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
             </div>
 
             <div className="flex-1 overflow-auto p-4 space-y-4">
-              {/* Status Card */}
               <Card className="border-border">
                 <CardHeader className="py-3 px-4">
                   <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -414,7 +626,6 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
                 </CardContent>
               </Card>
 
-              {/* Models Running */}
               <Card className="border-border">
                 <CardHeader className="py-3 px-4">
                   <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -427,28 +638,33 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
                   ) : (
                     <div className="space-y-2">
                       {selectedNode.models.map((model) => (
-                        <div
+                        <Link
                           key={model.id}
-                          className="flex items-center justify-between p-2 rounded-md bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
+                          href={`/models/${model.id}`}
+                          className="flex items-center justify-between p-2 rounded-md bg-muted/50 hover:bg-primary/10 transition-colors group"
                         >
                           <div className="flex items-center gap-2">
-                            <Box className="h-3.5 w-3.5 text-muted-foreground" />
+                            <Box className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
                             <div>
-                              <p className="text-xs font-medium text-foreground">{model.name}</p>
+                              <p className="text-xs font-medium text-foreground group-hover:text-primary transition-colors">
+                                {model.name}
+                              </p>
                               {model.accuracy && (
                                 <p className="text-[10px] text-muted-foreground">{model.accuracy} accuracy</p>
                               )}
                             </div>
                           </div>
-                          {getModelStatusIcon(model.status)}
-                        </div>
+                          <div className="flex items-center gap-1">
+                            {getModelStatusIcon(model.status)}
+                            <ArrowRight className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                          </div>
+                        </Link>
                       ))}
                     </div>
                   )}
                 </CardContent>
               </Card>
 
-              {/* Quick Stats */}
               <Card className="border-border">
                 <CardHeader className="py-3 px-4">
                   <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -471,7 +687,6 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
                 </CardContent>
               </Card>
 
-              {/* Activity Chart Placeholder */}
               <Card className="border-border">
                 <CardHeader className="py-3 px-4">
                   <CardTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -493,16 +708,193 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
               </Card>
             </div>
 
-            {/* Actions */}
-            <div className="p-4 border-t border-border">
-              <Button className="w-full" size="sm">
-                <Activity className="h-4 w-4 mr-2" />
-                View Full Details
+            <div className="p-4 border-t border-border space-y-2">
+              <Button
+                className="w-full"
+                size="sm"
+                onClick={() => {
+                  setAddModelForm({ nodeId: selectedNode.id, modelName: "" });
+                  setAddModelDialog(true);
+                }}
+                variant="outline"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Model
+              </Button>
+              <Button
+                className="w-full"
+                size="sm"
+                onClick={(e) => openEditNode(selectedNode, e)}
+              >
+                <Pencil className="h-4 w-4 mr-2" />
+                Edit Node
               </Button>
             </div>
           </div>
         )}
       </div>
+
+      {/* Edit Node Dialog */}
+      <Dialog open={!!editingNode} onOpenChange={() => setEditingNode(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Node</DialogTitle>
+            <DialogDescription>Update the node name, type, and status.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground">Name</label>
+              <input
+                className={inputClass}
+                value={editForm.name}
+                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                placeholder="Node name"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground">Type</label>
+              <select
+                className={inputClass}
+                value={editForm.type}
+                onChange={(e) => setEditForm({ ...editForm, type: e.target.value as Node["type"] })}
+              >
+                <option value="machine">Machine</option>
+                <option value="sensor">Sensor</option>
+                <option value="controller">Controller</option>
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground">Status</label>
+              <select
+                className={inputClass}
+                value={editForm.status}
+                onChange={(e) => setEditForm({ ...editForm, status: e.target.value as Node["status"] })}
+              >
+                <option value="online">Online</option>
+                <option value="warning">Warning</option>
+                <option value="offline">Offline</option>
+              </select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingNode(null)}>
+              Cancel
+            </Button>
+            <Button onClick={saveEditNode} disabled={!editForm.name.trim()}>
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Node Dialog */}
+      <Dialog open={!!deletingNode} onOpenChange={() => setDeletingNode(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete Node</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete{" "}
+              <span className="font-medium text-foreground">{deletingNode?.name}</span>? This cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeletingNode(null)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDeleteNode}>
+              Delete Node
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Node Dialog */}
+      <Dialog open={addingNode} onOpenChange={setAddingNode}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add Node</DialogTitle>
+            <DialogDescription>Add a new machine, sensor, or controller to this workspace.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground">Name</label>
+              <input
+                className={inputClass}
+                value={addNodeForm.name}
+                onChange={(e) => setAddNodeForm({ ...addNodeForm, name: e.target.value })}
+                placeholder="e.g. Hydraulic Press D1"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground">Type</label>
+              <select
+                className={inputClass}
+                value={addNodeForm.type}
+                onChange={(e) => setAddNodeForm({ ...addNodeForm, type: e.target.value as Node["type"] })}
+              >
+                <option value="machine">Machine</option>
+                <option value="sensor">Sensor</option>
+                <option value="controller">Controller</option>
+              </select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddingNode(false)}>
+              Cancel
+            </Button>
+            <Button onClick={saveAddNode} disabled={!addNodeForm.name.trim()}>
+              Add Node
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Model to Node Dialog */}
+      <Dialog open={addModelDialog} onOpenChange={setAddModelDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add Model to Node</DialogTitle>
+            <DialogDescription>Assign an AI model to a node in this workspace.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground">Node</label>
+              <select
+                className={inputClass}
+                value={addModelForm.nodeId}
+                onChange={(e) => setAddModelForm({ ...addModelForm, nodeId: e.target.value })}
+              >
+                <option value="">Select a node…</option>
+                {nodes.map((n) => (
+                  <option key={n.id} value={n.id}>
+                    {n.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground">Model Name</label>
+              <input
+                className={inputClass}
+                value={addModelForm.modelName}
+                onChange={(e) => setAddModelForm({ ...addModelForm, modelName: e.target.value })}
+                placeholder="e.g. Predictive Maintenance v3"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddModelDialog(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={saveAddModel}
+              disabled={!addModelForm.nodeId || !addModelForm.modelName.trim()}
+            >
+              Add Model
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 }
