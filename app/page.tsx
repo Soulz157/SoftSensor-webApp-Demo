@@ -12,7 +12,7 @@ export default function Home() {
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  
+
   // Sidebar state
   const [activeWorkspace, setActiveWorkspace] = useState("1");
   const [workspaceOpen, setWorkspaceOpen] = useState(true);
@@ -31,16 +31,14 @@ export default function Home() {
         onWorkspaceToggle={() => setWorkspaceOpen(!workspaceOpen)}
       />
 
-      {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        {/* Header */}
         <Header
           onCreateWorkspace={() => setCreateDialogOpen(true)}
           onMenuClick={() => setSidebarOpen(true)}
         />
 
         {/* Dashboard Content */}
-        <DashboardContent 
+        <DashboardContent
           onCreateWorkspace={() => setCreateDialogOpen(true)}
           onImportModel={() => setImportDialogOpen(true)}
         />

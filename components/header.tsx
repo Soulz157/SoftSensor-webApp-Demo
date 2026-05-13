@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Plus, Bell, User, Menu } from "lucide-react";
+import { Plus, Bell, User, Menu, Search, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -19,10 +19,30 @@ interface HeaderProps {
 
 export function Header({ onCreateWorkspace, onMenuClick }: HeaderProps) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  if (searchOpen) {
+    return (
+      <header className="flex h-16 items-center gap-3 border-b border-border bg-card px-4 lg:px-6">
+        <button
+          onClick={() => setSearchOpen(false)}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </button>
+        <input
+          autoFocus
+          type="text"
+          placeholder="Search workspaces, models..."
+          className="flex-1 h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+        />
+      </header>
+    );
+  }
 
   return (
     <header className="flex h-16 items-center justify-between border-b border-border bg-card px-4 lg:px-6">
-      {/* Left side - Menu button for mobile */}
+      {/* Left side */}
       <div className="flex items-center gap-3">
         <button
           onClick={onMenuClick}
@@ -30,7 +50,25 @@ export function Header({ onCreateWorkspace, onMenuClick }: HeaderProps) {
         >
           <Menu className="h-5 w-5" />
         </button>
-        <h1 className="text-lg font-semibold text-foreground hidden sm:block">Dashboard</h1>
+        {/* Mobile search icon */}
+        <button
+          onClick={() => setSearchOpen(true)}
+          className="flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors sm:hidden"
+        >
+          <Search className="h-5 w-5" />
+        </button>
+      </div>
+
+      {/* Desktop search */}
+      <div className="hidden sm:flex items-center gap-4 flex-1 max-w-md">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Search workspaces, models..."
+            className="h-9 w-full rounded-md border border-input bg-background pl-9 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          />
+        </div>
       </div>
 
       {/* Right Actions */}
