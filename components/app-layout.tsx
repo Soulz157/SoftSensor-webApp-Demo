@@ -3,17 +3,18 @@
 import { useState } from "react";
 import { Sidebar } from "@/components/sidebar";
 import { Header } from "@/components/header";
-import { DashboardContent } from "@/components/dashboard-content";
 import { CreateWorkspaceDialog } from "@/components/create-project-dialog";
 import { ImportModelDialog } from "@/components/import-model-dialog";
 
-export default function Home() {
+interface AppLayoutProps {
+  children: React.ReactNode;
+}
+
+export function AppLayout({ children }: AppLayoutProps) {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  
-  // Sidebar state
   const [activeWorkspace, setActiveWorkspace] = useState("1");
   const [workspaceOpen, setWorkspaceOpen] = useState(true);
 
@@ -39,11 +40,8 @@ export default function Home() {
           onMenuClick={() => setSidebarOpen(true)}
         />
 
-        {/* Dashboard Content */}
-        <DashboardContent 
-          onCreateWorkspace={() => setCreateDialogOpen(true)}
-          onImportModel={() => setImportDialogOpen(true)}
-        />
+        {/* Page Content */}
+        {children}
       </div>
 
       {/* Create Workspace Dialog */}

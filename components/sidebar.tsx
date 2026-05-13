@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Settings,
@@ -8,7 +10,6 @@ import {
   Building2,
   Box,
   BarChart3,
-  ChevronRight,
   X,
   PanelLeftClose,
   PanelLeft,
@@ -25,6 +26,7 @@ interface NavItem {
   id: string;
   name: string;
   icon: React.ReactNode;
+  href: string;
   badge?: number;
 }
 
@@ -39,8 +41,6 @@ interface SidebarProps {
   onClose: () => void;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
-  activeNav: string;
-  onNavChange: (nav: string) => void;
   activeWorkspace: string;
   onWorkspaceChange: (id: string) => void;
   workspaceOpen: boolean;
@@ -52,21 +52,25 @@ export function Sidebar({
   onClose,
   isCollapsed,
   onToggleCollapse,
-  activeNav,
-  onNavChange,
   activeWorkspace,
   onWorkspaceChange,
   workspaceOpen,
   onWorkspaceToggle,
 }: SidebarProps) {
+  const pathname = usePathname();
   const currentWorkspace = workspaces.find((w) => w.id === activeWorkspace);
 
   const navItems: NavItem[] = [
-    { id: "dashboard", name: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
-    { id: "models", name: "Models", icon: <Box className="h-4 w-4" />, badge: currentWorkspace?.modelsCount },
-    { id: "analytics", name: "Analytics", icon: <BarChart3 className="h-4 w-4" /> },
-    { id: "settings", name: "Settings", icon: <Settings className="h-4 w-4" /> },
+    { id: "dashboard", name: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" />, href: "/" },
+    { id: "models", name: "Models", icon: <Box className="h-4 w-4" />, href: "/models", badge: currentWorkspace?.modelsCount },
+    { id: "analytics", name: "Analytics", icon: <BarChart3 className="h-4 w-4" />, href: "/analytics" },
+    { id: "settings", name: "Settings", icon: <Settings className="h-4 w-4" />, href: "/settings" },
   ];
+
+  const isActiveNav = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname.startsWith(href);
+  };
 
   return (
     <>
@@ -82,12 +86,9 @@ export function Sidebar({
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-50 flex h-screen flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300 ease-in-out lg:static",
-          // Mobile: slide in/out
           isOpen ? "translate-x-0" : "-translate-x-full",
-          // Desktop: always visible, toggle width
           "lg:translate-x-0",
           isCollapsed ? "lg:w-16" : "lg:w-64",
-          // Mobile always full width when open
           "w-64"
         )}
       >
@@ -96,7 +97,7 @@ export function Sidebar({
           "flex items-center border-b border-sidebar-border transition-all",
           isCollapsed ? "justify-center px-2 py-4" : "justify-between px-4 py-4"
         )}>
-          <div className={cn(
+          <Link href="/" className={cn(
             "flex items-center gap-3",
             isCollapsed && "lg:justify-center"
           )}>
@@ -109,7 +110,7 @@ export function Sidebar({
             )}>
               SoftSensor
             </span>
-          </div>
+          </Link>
           
           {/* Desktop collapse toggle */}
           <button
@@ -118,7 +119,7 @@ export function Sidebar({
               "hidden lg:flex h-8 w-8 items-center justify-center rounded-md text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors",
               isCollapsed && "lg:hidden"
             )}
-            title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            title="Collapse sidebar"
           >
             <PanelLeftClose className="h-4 w-4" />
           </button>
@@ -165,9 +166,13 @@ export function Sidebar({
           {(workspaceOpen || isCollapsed) && (
             <div className={cn("space-y-1", !isCollapsed && "mt-2")}>
               {workspaces.map((workspace) => (
-                <button
+                <Link
                   key={workspace.id}
-                  onClick={() => onWorkspaceChange(workspace.id)}
+                  href={`/workspace/${workspace.id}`}
+                  onClick={() => {
+                    onWorkspaceChange(workspace.id);
+                    onClose();
+                  }}
                   title={isCollapsed ? workspace.name : undefined}
                   className={cn(
                     "group flex w-full items-center rounded-md text-sm transition-colors",
@@ -184,12 +189,9 @@ export function Sidebar({
                       <span className="text-xs text-sidebar-foreground/50">
                         {workspace.modelsCount}
                       </span>
-                      {activeWorkspace === workspace.id && (
-                        <ChevronRight className="h-3 w-3 text-primary" />
-                      )}
                     </>
                   )}
-                </button>
+                </Link>
               ))}
             </div>
           )}
@@ -202,14 +204,15 @@ export function Sidebar({
         <nav className={cn("flex-1 py-4", isCollapsed ? "px-2" : "px-3")}>
           <div className="space-y-1">
             {navItems.map((item) => (
-              <button
+              <Link
                 key={item.id}
-                onClick={() => onNavChange(item.id)}
+                href={item.href}
+                onClick={onClose}
                 title={isCollapsed ? item.name : undefined}
                 className={cn(
                   "flex w-full items-center rounded-md text-sm font-medium transition-colors",
                   isCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
-                  activeNav === item.id
+                  isActiveNav(item.href)
                     ? "bg-sidebar-primary text-sidebar-primary-foreground"
                     : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
                 )}
@@ -222,7 +225,7 @@ export function Sidebar({
                       <span
                         className={cn(
                           "ml-auto rounded-full px-2 py-0.5 text-xs",
-                          activeNav === item.id
+                          isActiveNav(item.href)
                             ? "bg-sidebar-primary-foreground/20 text-sidebar-primary-foreground"
                             : "bg-sidebar-accent text-sidebar-foreground/60"
                         )}
@@ -232,7 +235,7 @@ export function Sidebar({
                     )}
                   </>
                 )}
-              </button>
+              </Link>
             ))}
           </div>
         </nav>
@@ -278,16 +281,21 @@ export function Sidebar({
           "border-t border-sidebar-border py-4",
           isCollapsed ? "px-2" : "px-3"
         )}>
-          <button 
+          <Link
+            href="/help"
+            onClick={onClose}
             title={isCollapsed ? "Help & Support" : undefined}
             className={cn(
-              "flex w-full items-center rounded-md text-sm text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors",
-              isCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2"
+              "flex w-full items-center rounded-md text-sm transition-colors",
+              isCollapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2",
+              pathname === "/help"
+                ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                : "text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground"
             )}
           >
             <HelpCircle className="h-4 w-4" />
             {!isCollapsed && <span>Help & Support</span>}
-          </button>
+          </Link>
         </div>
       </aside>
     </>
