@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, use } from "react";
+import { useState, use, useRef } from "react";
 import Link from "next/link";
 import { AppLayout } from "@/components/app-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -216,6 +216,45 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
 
   const [showModelActions, setShowModelActions] = useState(false);
 
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const dragMoved = useRef(false);
+  const [dragging, setDragging] = useState<{
+    nodeId: string;
+    startMouseX: number;
+    startMouseY: number;
+    startNodeX: number;
+    startNodeY: number;
+  } | null>(null);
+
+  const handleNodeMouseDown = (node: Node, e: React.MouseEvent) => {
+    e.preventDefault();
+    dragMoved.current = false;
+    setDragging({
+      nodeId: node.id,
+      startMouseX: e.clientX,
+      startMouseY: e.clientY,
+      startNodeX: node.x,
+      startNodeY: node.y,
+    });
+  };
+
+  const handleCanvasMouseMove = (e: React.MouseEvent) => {
+    if (!dragging || !canvasRef.current) return;
+    const rect = canvasRef.current.getBoundingClientRect();
+    const deltaX = ((e.clientX - dragging.startMouseX) / rect.width) * 100;
+    const deltaY = ((e.clientY - dragging.startMouseY) / rect.height) * 100;
+    const newX = Math.min(96, Math.max(2, dragging.startNodeX + deltaX));
+    const newY = Math.min(96, Math.max(2, dragging.startNodeY + deltaY));
+    dragMoved.current = true;
+    setNodes((prev) =>
+      prev.map((n) => (n.id === dragging.nodeId ? { ...n, x: newX, y: newY } : n))
+    );
+  };
+
+  const handleCanvasMouseUp = () => {
+    setDragging(null);
+  };
+
   const [addModelDialog, setAddModelDialog] = useState(false);
   const [addModelForm, setAddModelForm] = useState({ nodeId: "", modelName: "" });
 
@@ -403,7 +442,12 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
           </div>
 
           {/* Canvas */}
-          <div className="flex-1 relative overflow-hidden bg-muted/30">
+          <div
+            className="flex-1 relative overflow-hidden bg-muted/30"
+            onMouseMove={handleCanvasMouseMove}
+            onMouseUp={handleCanvasMouseUp}
+            onMouseLeave={handleCanvasMouseUp}
+          >
             <div
               className="absolute inset-0"
               style={{
@@ -416,6 +460,7 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
             />
 
             <div
+              ref={canvasRef}
               className="absolute inset-4 border-2 border-dashed border-border/50 rounded-lg"
               style={{ transform: `scale(${zoom})`, transformOrigin: "center" }}
             >
@@ -461,7 +506,13 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
                   }}
                 >
                   <button
-                    onClick={() => !buildMode && setSelectedNode(node)}
+                    onClick={() => {
+                      if (dragMoved.current) return;
+                      if (!buildMode) setSelectedNode(node);
+                    }}
+                    onMouseDown={(e) => {
+                      if (buildMode) handleNodeMouseDown(node, e);
+                    }}
                     className={`relative flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
                       !buildMode ? "hover:scale-110" : ""
                     } ${
@@ -470,7 +521,13 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
                         : buildMode
                         ? "bg-card ring-2 ring-amber-500/40"
                         : "bg-card hover:bg-accent"
-                    } border border-border shadow-lg`}
+                    } border border-border shadow-lg ${
+                      buildMode
+                        ? dragging?.nodeId === node.id
+                          ? "cursor-grabbing"
+                          : "cursor-grab"
+                        : ""
+                    }`}
                   >
                     <div className="relative">
                       <div
