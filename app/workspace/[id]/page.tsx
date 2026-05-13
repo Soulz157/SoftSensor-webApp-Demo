@@ -61,8 +61,18 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         y: 20,
         status: "online",
         models: [
-          { id: "1", name: "Temperature Predictor", status: "running", accuracy: "94.2%" },
-          { id: "6", name: "Vibration Analyzer", status: "running", accuracy: "91.5%" },
+          {
+            id: "1",
+            name: "Temperature Predictor",
+            status: "running",
+            accuracy: "94.2%",
+          },
+          {
+            id: "6",
+            name: "Vibration Analyzer",
+            status: "running",
+            accuracy: "91.5%",
+          },
         ],
       },
       {
@@ -73,7 +83,12 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         y: 25,
         status: "online",
         models: [
-          { id: "4", name: "Quality Classifier", status: "running", accuracy: "96.1%" },
+          {
+            id: "4",
+            name: "Quality Classifier",
+            status: "running",
+            accuracy: "96.1%",
+          },
         ],
       },
       {
@@ -84,8 +99,18 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         y: 20,
         status: "warning",
         models: [
-          { id: "m4", name: "Speed Optimizer", status: "error", accuracy: "87.3%" },
-          { id: "5", name: "Energy Optimizer", status: "running", accuracy: "89.8%" },
+          {
+            id: "m4",
+            name: "Speed Optimizer",
+            status: "error",
+            accuracy: "87.3%",
+          },
+          {
+            id: "5",
+            name: "Energy Optimizer",
+            status: "running",
+            accuracy: "89.8%",
+          },
         ],
       },
       {
@@ -96,7 +121,12 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         y: 55,
         status: "online",
         models: [
-          { id: "3", name: "Anomaly Detector", status: "running", accuracy: "92.4%" },
+          {
+            id: "3",
+            name: "Anomaly Detector",
+            status: "running",
+            accuracy: "92.4%",
+          },
         ],
       },
       {
@@ -116,8 +146,18 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         y: 80,
         status: "online",
         models: [
-          { id: "5", name: "Energy Optimizer", status: "running", accuracy: "93.7%" },
-          { id: "2", name: "Demand Forecaster", status: "running", accuracy: "91.8%" },
+          {
+            id: "5",
+            name: "Energy Optimizer",
+            status: "running",
+            accuracy: "93.7%",
+          },
+          {
+            id: "2",
+            name: "Demand Forecaster",
+            status: "running",
+            accuracy: "91.8%",
+          },
           { id: "12", name: "Maintenance Predictor", status: "stopped" },
         ],
       },
@@ -134,7 +174,12 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         y: 25,
         status: "online",
         models: [
-          { id: "7", name: "Load Balancer AI", status: "running", accuracy: "97.2%" },
+          {
+            id: "7",
+            name: "Load Balancer AI",
+            status: "running",
+            accuracy: "97.2%",
+          },
         ],
       },
       {
@@ -145,7 +190,12 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         y: 30,
         status: "warning",
         models: [
-          { id: "8", name: "Cooling Optimizer", status: "running", accuracy: "88.5%" },
+          {
+            id: "8",
+            name: "Cooling Optimizer",
+            status: "running",
+            accuracy: "88.5%",
+          },
         ],
       },
       {
@@ -156,7 +206,12 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         y: 70,
         status: "online",
         models: [
-          { id: "9", name: "Traffic Analyzer", status: "running", accuracy: "95.1%" },
+          {
+            id: "9",
+            name: "Traffic Analyzer",
+            status: "running",
+            accuracy: "95.1%",
+          },
         ],
       },
     ],
@@ -171,9 +226,7 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         x: 30,
         y: 35,
         status: "offline",
-        models: [
-          { id: "10", name: "Data Classifier", status: "stopped" },
-        ],
+        models: [{ id: "10", name: "Data Classifier", status: "stopped" }],
       },
       {
         id: "n2",
@@ -183,14 +236,23 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         y: 40,
         status: "online",
         models: [
-          { id: "11", name: "Compression AI", status: "running", accuracy: "94.8%" },
+          {
+            id: "11",
+            name: "Compression AI",
+            status: "running",
+            accuracy: "94.8%",
+          },
         ],
       },
     ],
   },
 };
 
-export default function WorkspacePage({ params }: { params: Promise<{ id: string }> }) {
+export default function WorkspacePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = use(params);
   const workspaceBase = workspaceData[id] || workspaceData["1"];
 
@@ -240,23 +302,32 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
 
   const handleCanvasMouseMove = (e: React.MouseEvent) => {
     if (!dragging || !canvasRef.current) return;
+    const pixelDeltaX = e.clientX - dragging.startMouseX;
+    const pixelDeltaY = e.clientY - dragging.startMouseY;
+    if (Math.abs(pixelDeltaX) < 5 && Math.abs(pixelDeltaY) < 5) return;
     const rect = canvasRef.current.getBoundingClientRect();
-    const deltaX = ((e.clientX - dragging.startMouseX) / rect.width) * 100;
-    const deltaY = ((e.clientY - dragging.startMouseY) / rect.height) * 100;
+    const deltaX = (pixelDeltaX / rect.width) * 100;
+    const deltaY = (pixelDeltaY / rect.height) * 100;
     const newX = Math.min(96, Math.max(2, dragging.startNodeX + deltaX));
     const newY = Math.min(96, Math.max(2, dragging.startNodeY + deltaY));
     dragMoved.current = true;
     setNodes((prev) =>
-      prev.map((n) => (n.id === dragging.nodeId ? { ...n, x: newX, y: newY } : n))
+      prev.map((n) =>
+        n.id === dragging.nodeId ? { ...n, x: newX, y: newY } : n,
+      ),
     );
   };
 
   const handleCanvasMouseUp = () => {
     setDragging(null);
+    dragMoved.current = false;
   };
 
   const [addModelDialog, setAddModelDialog] = useState(false);
-  const [addModelForm, setAddModelForm] = useState({ nodeId: "", modelName: "" });
+  const [addModelForm, setAddModelForm] = useState({
+    nodeId: "",
+    modelName: "",
+  });
 
   const openEditNode = (node: Node, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -267,7 +338,7 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
   const saveEditNode = () => {
     if (!editingNode) return;
     const updated = nodes.map((n) =>
-      n.id === editingNode.id ? { ...n, ...editForm } : n
+      n.id === editingNode.id ? { ...n, ...editForm } : n,
     );
     setNodes(updated);
     if (selectedNode?.id === editingNode.id) {
@@ -320,8 +391,8 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
                 },
               ],
             }
-          : n
-      )
+          : n,
+      ),
     );
     if (selectedNode?.id === addModelForm.nodeId) {
       const target = nodes.find((n) => n.id === addModelForm.nodeId);
@@ -330,7 +401,11 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
           ...target,
           models: [
             ...target.models,
-            { id: `m${Date.now()}`, name: addModelForm.modelName, status: "stopped" },
+            {
+              id: `m${Date.now()}`,
+              name: addModelForm.modelName,
+              status: "stopped",
+            },
           ],
         });
       }
@@ -388,9 +463,14 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
             }`}
           >
             <div>
-              <h1 className="text-lg font-semibold text-foreground">{workspaceBase.name}</h1>
+              <h1 className="text-lg font-semibold text-foreground">
+                {workspaceBase.name}
+              </h1>
               <p className="text-xs text-muted-foreground">
-                {nodes.length} nodes{buildMode ? " — Build Mode active" : " — Click a node to view details"}
+                {nodes.length} nodes
+                {buildMode
+                  ? " — Build Mode active"
+                  : " — Click a node to view details"}
               </p>
             </div>
             <div className="flex items-center gap-1">
@@ -432,7 +512,12 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
               >
                 <ZoomOut className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="icon" onClick={() => setZoom(1)} title="Reset View">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setZoom(1)}
+                title="Reset View"
+              >
                 <RotateCcw className="h-4 w-4" />
               </Button>
               <Button variant="ghost" size="icon" title="Fullscreen">
@@ -474,7 +559,10 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
                     refY="3.5"
                     orient="auto"
                   >
-                    <polygon points="0 0, 10 3.5, 0 7" className="fill-primary/30" />
+                    <polygon
+                      points="0 0, 10 3.5, 0 7"
+                      className="fill-primary/30"
+                    />
                   </marker>
                 </defs>
                 {nodes.map((node, i) => {
@@ -519,8 +607,8 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
                       selectedNode?.id === node.id
                         ? "bg-primary/20 ring-2 ring-primary"
                         : buildMode
-                        ? "bg-card ring-2 ring-amber-500/40"
-                        : "bg-card hover:bg-accent"
+                          ? "bg-card ring-2 ring-amber-500/40"
+                          : "bg-card hover:bg-accent"
                     } border border-border shadow-lg ${
                       buildMode
                         ? dragging?.nodeId === node.id
@@ -535,8 +623,8 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
                           node.status === "online"
                             ? "bg-primary/10 text-primary"
                             : node.status === "warning"
-                            ? "bg-amber-500/10 text-amber-500"
-                            : "bg-red-500/10 text-red-500"
+                              ? "bg-amber-500/10 text-amber-500"
+                              : "bg-red-500/10 text-red-500"
                         }`}
                       >
                         {getNodeIcon(node.type)}
@@ -550,7 +638,8 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
                     </span>
                     {node.models.length > 0 && (
                       <span className="text-[9px] text-muted-foreground">
-                        {node.models.length} model{node.models.length > 1 ? "s" : ""}
+                        {node.models.length} model
+                        {node.models.length > 1 ? "s" : ""}
                       </span>
                     )}
                   </button>
@@ -615,7 +704,10 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
                   <div className="px-3 pb-3 space-y-2">
                     <button
                       onClick={() => {
-                        setAddModelForm({ nodeId: nodes[0]?.id ?? "", modelName: "" });
+                        setAddModelForm({
+                          nodeId: nodes[0]?.id ?? "",
+                          modelName: "",
+                        });
                         setAddModelDialog(true);
                       }}
                       className="flex items-center gap-2 w-full rounded-md px-2 py-1.5 text-xs font-medium text-foreground bg-primary/10 hover:bg-primary/20 transition-colors"
@@ -650,18 +742,26 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
                     selectedNode.status === "online"
                       ? "bg-primary/10 text-primary"
                       : selectedNode.status === "warning"
-                      ? "bg-amber-500/10 text-amber-500"
-                      : "bg-red-500/10 text-red-500"
+                        ? "bg-amber-500/10 text-amber-500"
+                        : "bg-red-500/10 text-red-500"
                   }`}
                 >
                   {getNodeIcon(selectedNode.type)}
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-foreground">{selectedNode.name}</h3>
-                  <p className="text-xs text-muted-foreground capitalize">{selectedNode.type}</p>
+                  <h3 className="text-sm font-medium text-foreground">
+                    {selectedNode.name}
+                  </h3>
+                  <p className="text-xs text-muted-foreground capitalize">
+                    {selectedNode.type}
+                  </p>
                 </div>
               </div>
-              <Button variant="ghost" size="icon" onClick={() => setSelectedNode(null)}>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSelectedNode(null)}
+              >
                 <X className="h-4 w-4" />
               </Button>
             </div>
@@ -675,7 +775,9 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
                 </CardHeader>
                 <CardContent className="py-3 px-4">
                   <div className="flex items-center gap-2">
-                    <span className={`h-2 w-2 rounded-full ${getStatusColor(selectedNode.status)}`} />
+                    <span
+                      className={`h-2 w-2 rounded-full ${getStatusColor(selectedNode.status)}`}
+                    />
                     <span className="text-sm font-medium text-foreground capitalize">
                       {selectedNode.status}
                     </span>
@@ -691,7 +793,9 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
                 </CardHeader>
                 <CardContent className="py-2 px-4">
                   {selectedNode.models.length === 0 ? (
-                    <p className="text-sm text-muted-foreground py-2">No models assigned</p>
+                    <p className="text-sm text-muted-foreground py-2">
+                      No models assigned
+                    </p>
                   ) : (
                     <div className="space-y-2">
                       {selectedNode.models.map((model) => (
@@ -707,7 +811,9 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
                                 {model.name}
                               </p>
                               {model.accuracy && (
-                                <p className="text-[10px] text-muted-foreground">{model.accuracy} accuracy</p>
+                                <p className="text-[10px] text-muted-foreground">
+                                  {model.accuracy} accuracy
+                                </p>
                               )}
                             </div>
                           </div>
@@ -730,16 +836,28 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
                 </CardHeader>
                 <CardContent className="py-3 px-4 space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">Uptime</span>
-                    <span className="text-xs font-medium text-foreground">99.8%</span>
+                    <span className="text-xs text-muted-foreground">
+                      Uptime
+                    </span>
+                    <span className="text-xs font-medium text-foreground">
+                      99.8%
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">Last Update</span>
-                    <span className="text-xs font-medium text-foreground">2 min ago</span>
+                    <span className="text-xs text-muted-foreground">
+                      Last Update
+                    </span>
+                    <span className="text-xs font-medium text-foreground">
+                      2 min ago
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">Data Points</span>
-                    <span className="text-xs font-medium text-foreground">1.2M</span>
+                    <span className="text-xs text-muted-foreground">
+                      Data Points
+                    </span>
+                    <span className="text-xs font-medium text-foreground">
+                      1.2M
+                    </span>
                   </div>
                 </CardContent>
               </Card>
@@ -752,15 +870,19 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
                 </CardHeader>
                 <CardContent className="py-3 px-4">
                   <div className="flex items-end gap-1 h-16">
-                    {[40, 65, 45, 80, 55, 70, 85, 60, 75, 50, 90, 65].map((height, i) => (
-                      <div
-                        key={i}
-                        className="flex-1 bg-primary/20 rounded-t"
-                        style={{ height: `${height}%` }}
-                      />
-                    ))}
+                    {[40, 65, 45, 80, 55, 70, 85, 60, 75, 50, 90, 65].map(
+                      (height, i) => (
+                        <div
+                          key={i}
+                          className="flex-1 bg-primary/20 rounded-t"
+                          style={{ height: `${height}%` }}
+                        />
+                      ),
+                    )}
                   </div>
-                  <p className="text-[10px] text-muted-foreground mt-2 text-center">Last 12 hours</p>
+                  <p className="text-[10px] text-muted-foreground mt-2 text-center">
+                    Last 12 hours
+                  </p>
                 </CardContent>
               </Card>
             </div>
@@ -796,24 +918,37 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Edit Node</DialogTitle>
-            <DialogDescription>Update the node name, type, and status.</DialogDescription>
+            <DialogDescription>
+              Update the node name, type, and status.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Name</label>
+              <label className="text-sm font-medium text-foreground">
+                Name
+              </label>
               <input
                 className={inputClass}
                 value={editForm.name}
-                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, name: e.target.value })
+                }
                 placeholder="Node name"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Type</label>
+              <label className="text-sm font-medium text-foreground">
+                Type
+              </label>
               <select
                 className={inputClass}
                 value={editForm.type}
-                onChange={(e) => setEditForm({ ...editForm, type: e.target.value as Node["type"] })}
+                onChange={(e) =>
+                  setEditForm({
+                    ...editForm,
+                    type: e.target.value as Node["type"],
+                  })
+                }
               >
                 <option value="machine">Machine</option>
                 <option value="sensor">Sensor</option>
@@ -821,11 +956,18 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
               </select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Status</label>
+              <label className="text-sm font-medium text-foreground">
+                Status
+              </label>
               <select
                 className={inputClass}
                 value={editForm.status}
-                onChange={(e) => setEditForm({ ...editForm, status: e.target.value as Node["status"] })}
+                onChange={(e) =>
+                  setEditForm({
+                    ...editForm,
+                    status: e.target.value as Node["status"],
+                  })
+                }
               >
                 <option value="online">Online</option>
                 <option value="warning">Warning</option>
@@ -851,7 +993,10 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
             <DialogTitle>Delete Node</DialogTitle>
             <DialogDescription>
               Are you sure you want to delete{" "}
-              <span className="font-medium text-foreground">{deletingNode?.name}</span>? This cannot be undone.
+              <span className="font-medium text-foreground">
+                {deletingNode?.name}
+              </span>
+              ? This cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -870,24 +1015,37 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Add Node</DialogTitle>
-            <DialogDescription>Add a new machine, sensor, or controller to this workspace.</DialogDescription>
+            <DialogDescription>
+              Add a new machine, sensor, or controller to this workspace.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Name</label>
+              <label className="text-sm font-medium text-foreground">
+                Name
+              </label>
               <input
                 className={inputClass}
                 value={addNodeForm.name}
-                onChange={(e) => setAddNodeForm({ ...addNodeForm, name: e.target.value })}
+                onChange={(e) =>
+                  setAddNodeForm({ ...addNodeForm, name: e.target.value })
+                }
                 placeholder="e.g. Hydraulic Press D1"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Type</label>
+              <label className="text-sm font-medium text-foreground">
+                Type
+              </label>
               <select
                 className={inputClass}
                 value={addNodeForm.type}
-                onChange={(e) => setAddNodeForm({ ...addNodeForm, type: e.target.value as Node["type"] })}
+                onChange={(e) =>
+                  setAddNodeForm({
+                    ...addNodeForm,
+                    type: e.target.value as Node["type"],
+                  })
+                }
               >
                 <option value="machine">Machine</option>
                 <option value="sensor">Sensor</option>
@@ -911,15 +1069,21 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Add Model to Node</DialogTitle>
-            <DialogDescription>Assign an AI model to a node in this workspace.</DialogDescription>
+            <DialogDescription>
+              Assign an AI model to a node in this workspace.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Node</label>
+              <label className="text-sm font-medium text-foreground">
+                Node
+              </label>
               <select
                 className={inputClass}
                 value={addModelForm.nodeId}
-                onChange={(e) => setAddModelForm({ ...addModelForm, nodeId: e.target.value })}
+                onChange={(e) =>
+                  setAddModelForm({ ...addModelForm, nodeId: e.target.value })
+                }
               >
                 <option value="">Select a node…</option>
                 {nodes.map((n) => (
@@ -930,11 +1094,18 @@ export default function WorkspacePage({ params }: { params: Promise<{ id: string
               </select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Model Name</label>
+              <label className="text-sm font-medium text-foreground">
+                Model Name
+              </label>
               <input
                 className={inputClass}
                 value={addModelForm.modelName}
-                onChange={(e) => setAddModelForm({ ...addModelForm, modelName: e.target.value })}
+                onChange={(e) =>
+                  setAddModelForm({
+                    ...addModelForm,
+                    modelName: e.target.value,
+                  })
+                }
                 placeholder="e.g. Predictive Maintenance v3"
               />
             </div>
