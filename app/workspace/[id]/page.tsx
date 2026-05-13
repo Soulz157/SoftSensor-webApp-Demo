@@ -40,7 +40,7 @@ interface Node {
   type: "machine" | "sensor" | "controller";
   x: number;
   y: number;
-  status: "online" | "warning" | "offline";
+  status: "normal" | "warning" | "alarm" | "offline";
   models: {
     id: string;
     name: string;
@@ -59,7 +59,7 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         type: "machine",
         x: 15,
         y: 20,
-        status: "online",
+        status: "normal",
         models: [
           {
             id: "1",
@@ -81,7 +81,7 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         type: "machine",
         x: 45,
         y: 25,
-        status: "online",
+        status: "normal",
         models: [
           {
             id: "4",
@@ -119,7 +119,7 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         type: "sensor",
         x: 25,
         y: 55,
-        status: "online",
+        status: "normal",
         models: [
           {
             id: "3",
@@ -135,7 +135,7 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         type: "sensor",
         x: 55,
         y: 60,
-        status: "online",
+        status: "normal",
         models: [],
       },
       {
@@ -144,7 +144,7 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         type: "controller",
         x: 45,
         y: 80,
-        status: "online",
+        status: "normal",
         models: [
           {
             id: "5",
@@ -172,7 +172,7 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         type: "machine",
         x: 20,
         y: 25,
-        status: "online",
+        status: "normal",
         models: [
           {
             id: "7",
@@ -204,7 +204,7 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         type: "controller",
         x: 40,
         y: 70,
-        status: "online",
+        status: "normal",
         models: [
           {
             id: "9",
@@ -234,7 +234,7 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
         type: "machine",
         x: 70,
         y: 40,
-        status: "online",
+        status: "normal",
         models: [
           {
             id: "11",
@@ -266,7 +266,7 @@ export default function WorkspacePage({
     name: string;
     type: Node["type"];
     status: Node["status"];
-  }>({ name: "", type: "machine", status: "online" });
+  }>({ name: "", type: "machine", status: "normal" });
 
   const [deletingNode, setDeletingNode] = useState<Node | null>(null);
 
@@ -367,7 +367,7 @@ export default function WorkspacePage({
       type: addNodeForm.type,
       x: Math.floor(Math.random() * 55) + 20,
       y: Math.floor(Math.random() * 55) + 20,
-      status: "online",
+      status: "normal",
       models: [],
     };
     setNodes([...nodes, newNode]);
@@ -428,12 +428,14 @@ export default function WorkspacePage({
 
   const getStatusColor = (status: Node["status"]) => {
     switch (status) {
-      case "online":
+      case "normal":
         return "bg-emerald-500";
       case "warning":
         return "bg-amber-500";
-      case "offline":
+      case "alarm":
         return "bg-red-500";
+      case "offline":
+        return "bg-zinc-500";
     }
   };
 
@@ -620,11 +622,13 @@ export default function WorkspacePage({
                     <div className="relative">
                       <div
                         className={`p-2 rounded-md ${
-                          node.status === "online"
+                          node.status === "normal"
                             ? "bg-primary/10 text-primary"
                             : node.status === "warning"
                               ? "bg-amber-500/10 text-amber-500"
-                              : "bg-red-500/10 text-red-500"
+                              : node.status === "alarm"
+                                ? "bg-red-500/10 text-red-500"
+                                : "bg-zinc-500/10 text-zinc-500"
                         }`}
                       >
                         {getNodeIcon(node.type)}
@@ -687,7 +691,7 @@ export default function WorkspacePage({
                   <div className="px-3 pb-3 space-y-1.5">
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                      Online
+                      Normal
                     </div>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <span className="h-2 w-2 rounded-full bg-amber-500" />
@@ -695,6 +699,10 @@ export default function WorkspacePage({
                     </div>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <span className="h-2 w-2 rounded-full bg-red-500" />
+                      Alarm
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span className="h-2 w-2 rounded-full bg-zinc-500" />
                       Offline
                     </div>
                   </div>
@@ -739,11 +747,13 @@ export default function WorkspacePage({
               <div className="flex items-center gap-3">
                 <div
                   className={`p-2 rounded-md ${
-                    selectedNode.status === "online"
+                    selectedNode.status === "normal"
                       ? "bg-primary/10 text-primary"
                       : selectedNode.status === "warning"
                         ? "bg-amber-500/10 text-amber-500"
-                        : "bg-red-500/10 text-red-500"
+                        : selectedNode.status === "alarm"
+                          ? "bg-red-500/10 text-red-500"
+                          : "bg-zinc-500/10 text-zinc-500"
                   }`}
                 >
                   {getNodeIcon(selectedNode.type)}
@@ -969,8 +979,9 @@ export default function WorkspacePage({
                   })
                 }
               >
-                <option value="online">Online</option>
+                <option value="normal">Normal</option>
                 <option value="warning">Warning</option>
+                <option value="alarm">Alarm</option>
                 <option value="offline">Offline</option>
               </select>
             </div>
