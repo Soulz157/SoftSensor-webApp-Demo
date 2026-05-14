@@ -87,9 +87,9 @@ This document outlines **"what to do"** and **"what never to do"** for any AI ag
 
 ---
 
-## 🚫 The Absolute "Never Do" Summary
+## The Absolute "Never Do" Summary
 
-* Never guess or make assumptions if yo are unsure; always outline a plan and ask the uuser first.
+* Never guess or make assumptions if you are unsure; always outline a plan and ask the user first.
 * Never edit `components/ui/**` directly.
 * Never use Tailwind 3 class names.
 * Never render `useTheme()` without a `mounted` guard.
@@ -98,3 +98,4 @@ This document outlines **"what to do"** and **"what never to do"** for any AI ag
 * Never write Flux queries outside of `InfluxService`.
 * Never use the `any` type or leave `console.log` in code.
 * Never commit `.env` files or skip `pnpm lint`.
+* Never use emojis in any code, comments, or responses, and remove any existing emojis you encounter.

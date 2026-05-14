@@ -13,6 +13,8 @@ import {
   X,
   PanelLeftClose,
   PanelLeft,
+  CreditCard,
+  Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -85,6 +87,12 @@ export function Sidebar({
       name: "Settings",
       icon: <Settings className="h-4 w-4" />,
       href: "/settings",
+    },
+    {
+      id: "plans",
+      name: "Plans & Billing",
+      icon: <CreditCard className="h-4 w-4" />,
+      href: "/plans",
     },
   ];
 
@@ -277,42 +285,44 @@ export function Sidebar({
           </div>
         </nav>
 
-        {/* Current Workspace Info */}
+        {/* Upgrade Widget */}
         {currentWorkspace && !isCollapsed && (
-          <div className="mx-3 mb-3 rounded-lg bg-sidebar-accent/50 p-3">
-            <div className="flex items-center gap-2 mb-1">
-              <Building2 className="h-3.5 w-3.5 text-primary" />
-              <span className="text-xs font-medium text-sidebar-foreground">
-                {currentWorkspace.name}
-              </span>
+          <div className="mx-3 mb-3 rounded-lg border border-sidebar-border bg-sidebar-accent/30 p-3 space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <Zap className="h-3.5 w-3.5 text-amber-400" />
+                <span className="text-xs font-semibold text-sidebar-foreground">Starter Plan</span>
+              </div>
+              <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-medium text-amber-400">FREE</span>
             </div>
-            <div className="text-xs text-sidebar-foreground/60">
-              {currentWorkspace.modelsCount} / 100 models
+            <div>
+              <div className="flex justify-between mb-1">
+                <span className="text-[11px] text-sidebar-foreground/60">Active Models</span>
+                <span className="text-[11px] font-medium text-sidebar-foreground">4 / 5</span>
+              </div>
+              <div className="h-1.5 w-full rounded-full bg-sidebar-border">
+                <div className="h-full rounded-full bg-amber-400 transition-all" style={{ width: "80%" }} />
+              </div>
             </div>
-            <div className="mt-2 h-1.5 w-full rounded-full bg-sidebar-border">
-              <div
-                className="h-full rounded-full bg-primary transition-all"
-                style={{
-                  width: `${(currentWorkspace.modelsCount / 100) * 100}%`,
-                }}
-              />
-            </div>
+            <Link
+              href="/plans"
+              onClick={onClose}
+              className="flex w-full items-center justify-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              <Zap className="h-3 w-3" />
+              Upgrade Plan
+            </Link>
           </div>
         )}
 
-        {/* Collapsed Workspace indicator */}
+        {/* Collapsed upgrade indicator */}
         {currentWorkspace && isCollapsed && (
-          <div className="mx-2 mb-3 flex flex-col items-center">
+          <div className="mx-2 mb-3 flex flex-col items-center gap-1.5">
             <div
               className="h-1.5 w-8 rounded-full bg-sidebar-border overflow-hidden"
-              title={`${currentWorkspace.modelsCount} / 100 models`}
+              title="4/5 Models — Starter Plan"
             >
-              <div
-                className="h-full rounded-full bg-primary transition-all"
-                style={{
-                  width: `${(currentWorkspace.modelsCount / 100) * 100}%`,
-                }}
-              />
+              <div className="h-full rounded-full bg-amber-400 transition-all" style={{ width: "80%" }} />
             </div>
           </div>
         )}
