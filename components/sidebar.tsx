@@ -291,17 +291,28 @@ export function Sidebar({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <Zap className="h-3.5 w-3.5 text-amber-400" />
-                <span className="text-xs font-semibold text-sidebar-foreground">Starter Plan</span>
+                <span className="text-xs font-semibold text-sidebar-foreground">
+                  Starter Plan
+                </span>
               </div>
-              <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-medium text-amber-400">FREE</span>
+              <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-medium text-amber-400">
+                FREE
+              </span>
             </div>
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-[11px] text-sidebar-foreground/60">Active Models</span>
-                <span className="text-[11px] font-medium text-sidebar-foreground">4 / 5</span>
+                <span className="text-[11px] text-sidebar-foreground/60">
+                  Active Models
+                </span>
+                <span className="text-[11px] font-medium text-sidebar-foreground">
+                  4 / 5
+                </span>
               </div>
               <div className="h-1.5 w-full rounded-full bg-sidebar-border">
-                <div className="h-full rounded-full bg-amber-400 transition-all" style={{ width: "80%" }} />
+                <div
+                  className="h-full rounded-full bg-amber-400 transition-all"
+                  style={{ width: "80%" }}
+                />
               </div>
             </div>
             <Link
@@ -322,7 +333,10 @@ export function Sidebar({
               className="h-1.5 w-8 rounded-full bg-sidebar-border overflow-hidden"
               title="4/5 Models — Starter Plan"
             >
-              <div className="h-full rounded-full bg-amber-400 transition-all" style={{ width: "80%" }} />
+              <div
+                className="h-full rounded-full bg-amber-400 transition-all"
+                style={{ width: "80%" }}
+              />
             </div>
           </div>
         )}

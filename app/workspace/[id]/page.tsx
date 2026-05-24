@@ -44,7 +44,7 @@ interface Node {
   models: {
     id: string;
     name: string;
-    status: "running" | "stopped" | "error";
+    status: "running" | "warning" | "error" | "stopped";
     accuracy?: string;
   }[];
 }
@@ -70,7 +70,7 @@ const workspaceData: Record<string, { name: string; nodes: Node[] }> = {
           {
             id: "6",
             name: "Vibration Analyzer",
-            status: "running",
+            status: "warning",
             accuracy: "91.5%",
           },
         ],
@@ -439,6 +439,19 @@ export default function WorkspacePage({
     }
   };
 
+  const getModelStatusColor = (status: Node["models"][number]["status"]) => {
+    switch (status) {
+      case "running":
+        return "bg-emerald-500";
+      case "warning":
+        return "bg-amber-500";
+      case "error":
+        return "bg-red-500";
+      case "stopped":
+        return "bg-zinc-500";
+    }
+  };
+
   const getModelStatusIcon = (status: string) => {
     switch (status) {
       case "running":
@@ -603,7 +616,7 @@ export default function WorkspacePage({
                     onMouseDown={(e) => {
                       if (buildMode) handleNodeMouseDown(node, e);
                     }}
-                    className={`relative flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
+                    className={`relative flex flex-col items-center gap-2 p-3 rounded-lg min-w-35 transition-all ${
                       !buildMode ? "hover:scale-110" : ""
                     } ${
                       selectedNode?.id === node.id
@@ -637,14 +650,25 @@ export default function WorkspacePage({
                         className={`absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full ${getStatusColor(node.status)} ring-2 ring-card`}
                       />
                     </div>
-                    <span className="text-[10px] font-medium text-foreground whitespace-nowrap max-w-20 truncate">
+                    <span className="text-xs font-bold text-foreground whitespace-nowrap max-w-32 truncate">
                       {node.name}
                     </span>
                     {node.models.length > 0 && (
-                      <span className="text-[9px] text-muted-foreground">
-                        {node.models.length} model
-                        {node.models.length > 1 ? "s" : ""}
-                      </span>
+                      <div className="w-full flex items-center justify-between gap-2">
+                        <span className="text-[10px] text-muted-foreground">
+                          {node.models.length} model
+                          {node.models.length > 1 ? "s" : ""}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          {node.models.map((m) => (
+                            <span
+                              key={m.id}
+                              title={`${m.name} — ${m.status}`}
+                              className={`h-2 w-2 rounded-full ${getModelStatusColor(m.status)} ring-1 ring-card`}
+                            />
+                          ))}
+                        </div>
+                      </div>
                     )}
                   </button>
 

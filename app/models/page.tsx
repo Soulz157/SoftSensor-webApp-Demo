@@ -31,7 +31,8 @@ interface Model {
   name: string;
   workspace: string;
   workspaceId: string;
-  status: "running" | "stopped" | "error";
+  status: "running" | "warning" | "error" | "offline";
+  statusDetails?: string;
   accuracy: string;
   lastTrained: string;
   lastRun: string;
@@ -39,29 +40,158 @@ interface Model {
 }
 
 const allModels: Model[] = [
-  { id: "1", name: "Temperature Predictor", workspace: "Acme Corporation", workspaceId: "1", status: "running", accuracy: "94.2%", lastTrained: "2 days ago", lastRun: "2 min ago", type: "Regression" },
-  { id: "2", name: "Demand Forecaster", workspace: "Acme Corporation", workspaceId: "1", status: "running", accuracy: "91.8%", lastTrained: "1 week ago", lastRun: "5 min ago", type: "Time Series" },
-  { id: "3", name: "Anomaly Detector", workspace: "TechFlow Inc", workspaceId: "2", status: "error", accuracy: "87.5%", lastTrained: "3 days ago", lastRun: "12 min ago", type: "Classification" },
-  { id: "4", name: "Quality Classifier", workspace: "TechFlow Inc", workspaceId: "2", status: "running", accuracy: "96.1%", lastTrained: "5 days ago", lastRun: "Just now", type: "Classification" },
-  { id: "5", name: "Energy Optimizer", workspace: "DataSense Ltd", workspaceId: "3", status: "stopped", accuracy: "89.3%", lastTrained: "2 weeks ago", lastRun: "1 hour ago", type: "Optimization" },
-  { id: "6", name: "Vibration Analyzer", workspace: "Acme Corporation", workspaceId: "1", status: "running", accuracy: "91.5%", lastTrained: "4 days ago", lastRun: "3 min ago", type: "Signal Processing" },
-  { id: "7", name: "Load Balancer AI", workspace: "TechFlow Inc", workspaceId: "2", status: "running", accuracy: "97.2%", lastTrained: "1 day ago", lastRun: "1 min ago", type: "Optimization" },
-  { id: "8", name: "Cooling Optimizer", workspace: "TechFlow Inc", workspaceId: "2", status: "running", accuracy: "88.5%", lastTrained: "6 days ago", lastRun: "8 min ago", type: "Control" },
-  { id: "9", name: "Traffic Analyzer", workspace: "TechFlow Inc", workspaceId: "2", status: "running", accuracy: "95.1%", lastTrained: "3 days ago", lastRun: "4 min ago", type: "Classification" },
-  { id: "10", name: "Data Classifier", workspace: "DataSense Ltd", workspaceId: "3", status: "stopped", accuracy: "92.4%", lastTrained: "1 month ago", lastRun: "2 days ago", type: "Classification" },
-  { id: "11", name: "Compression AI", workspace: "DataSense Ltd", workspaceId: "3", status: "running", accuracy: "94.8%", lastTrained: "1 week ago", lastRun: "15 min ago", type: "Compression" },
-  { id: "12", name: "Maintenance Predictor", workspace: "Acme Corporation", workspaceId: "1", status: "stopped", accuracy: "90.2%", lastTrained: "2 weeks ago", lastRun: "3 hours ago", type: "Prediction" },
+  {
+    id: "1",
+    name: "Temperature Predictor",
+    workspace: "Acme Corporation",
+    workspaceId: "1",
+    status: "running",
+    accuracy: "94.2%",
+    lastTrained: "2 days ago",
+    lastRun: "2 min ago",
+    type: "Regression",
+  },
+  {
+    id: "2",
+    name: "Demand Forecaster",
+    workspace: "Acme Corporation",
+    workspaceId: "1",
+    status: "running",
+    accuracy: "91.8%",
+    lastTrained: "1 week ago",
+    lastRun: "5 min ago",
+    type: "Time Series",
+  },
+  {
+    id: "3",
+    name: "Anomaly Detector",
+    workspace: "TechFlow Inc",
+    workspaceId: "2",
+    status: "error",
+    statusDetails: "Deployment: Failed (missing input assets)",
+    accuracy: "87.5%",
+    lastTrained: "3 days ago",
+    lastRun: "12 min ago",
+    type: "Classification",
+  },
+  {
+    id: "4",
+    name: "Quality Classifier",
+    workspace: "TechFlow Inc",
+    workspaceId: "2",
+    status: "running",
+    accuracy: "96.1%",
+    lastTrained: "5 days ago",
+    lastRun: "Just now",
+    type: "Classification",
+  },
+  {
+    id: "5",
+    name: "Energy Optimizer",
+    workspace: "DataSense Ltd",
+    workspaceId: "3",
+    status: "warning",
+    statusDetails: "Production: High Latency alert",
+    accuracy: "89.3%",
+    lastTrained: "2 weeks ago",
+    lastRun: "1 hour ago",
+    type: "Optimization",
+  },
+  {
+    id: "6",
+    name: "Vibration Analyzer",
+    workspace: "Acme Corporation",
+    workspaceId: "1",
+    status: "running",
+    accuracy: "91.5%",
+    lastTrained: "4 days ago",
+    lastRun: "3 min ago",
+    type: "Signal Processing",
+  },
+  {
+    id: "7",
+    name: "Load Balancer AI",
+    workspace: "TechFlow Inc",
+    workspaceId: "2",
+    status: "running",
+    accuracy: "97.2%",
+    lastTrained: "1 day ago",
+    lastRun: "1 min ago",
+    type: "Optimization",
+  },
+  {
+    id: "8",
+    name: "Cooling Optimizer",
+    workspace: "TechFlow Inc",
+    workspaceId: "2",
+    status: "running",
+    accuracy: "88.5%",
+    lastTrained: "6 days ago",
+    lastRun: "8 min ago",
+    type: "Control",
+  },
+  {
+    id: "9",
+    name: "Traffic Analyzer",
+    workspace: "TechFlow Inc",
+    workspaceId: "2",
+    status: "running",
+    accuracy: "95.1%",
+    lastTrained: "3 days ago",
+    lastRun: "4 min ago",
+    type: "Classification",
+  },
+  {
+    id: "10",
+    name: "Data Classifier",
+    workspace: "DataSense Ltd",
+    workspaceId: "3",
+    status: "warning",
+    statusDetails: "Production: Data drift detected",
+    accuracy: "92.4%",
+    lastTrained: "1 month ago",
+    lastRun: "2 days ago",
+    type: "Classification",
+  },
+  {
+    id: "11",
+    name: "Compression AI",
+    workspace: "DataSense Ltd",
+    workspaceId: "3",
+    status: "running",
+    accuracy: "94.8%",
+    lastTrained: "1 week ago",
+    lastRun: "15 min ago",
+    type: "Compression",
+  },
+  {
+    id: "12",
+    name: "Maintenance Predictor",
+    workspace: "Acme Corporation",
+    workspaceId: "1",
+    status: "offline",
+    accuracy: "90.2%",
+    lastTrained: "2 weeks ago",
+    lastRun: "3 hours ago",
+    type: "Prediction",
+  },
 ];
 
 export default function ModelsPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "running" | "stopped" | "error">("all");
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "running" | "warning" | "error" | "offline"
+  >("all");
   const [workspaceFilter, setWorkspaceFilter] = useState<string>("all");
 
   const filteredModels = allModels.filter((model) => {
-    const matchesSearch = model.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === "all" || model.status === statusFilter;
-    const matchesWorkspace = workspaceFilter === "all" || model.workspaceId === workspaceFilter;
+    const matchesSearch = model.name
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    const matchesStatus =
+      statusFilter === "all" || model.status === statusFilter;
+    const matchesWorkspace =
+      workspaceFilter === "all" || model.workspaceId === workspaceFilter;
     return matchesSearch && matchesStatus && matchesWorkspace;
   });
 
@@ -69,10 +199,12 @@ export default function ModelsPage() {
     switch (status) {
       case "running":
         return <CheckCircle2 className="h-4 w-4 text-emerald-500" />;
-      case "stopped":
-        return <XCircle className="h-4 w-4 text-muted-foreground" />;
+      case "warning":
+        return <AlertTriangle className="h-4 w-4 text-amber-300" />;
       case "error":
         return <AlertTriangle className="h-4 w-4 text-amber-500" />;
+      case "offline":
+        return <XCircle className="h-4 w-4 text-zinc-500" />;
     }
   };
 
@@ -80,18 +212,21 @@ export default function ModelsPage() {
     switch (status) {
       case "running":
         return "bg-emerald-500/10 text-emerald-500";
-      case "stopped":
-        return "bg-muted text-muted-foreground";
+      case "warning":
+        return "bg-amber-300/10 text-amber-300";
       case "error":
         return "bg-amber-500/10 text-amber-500";
+      case "offline":
+        return "bg-zinc-500/10 text-zinc-500";
     }
   };
 
   const stats = {
     total: allModels.length,
     running: allModels.filter((m) => m.status === "running").length,
-    stopped: allModels.filter((m) => m.status === "stopped").length,
+    warning: allModels.filter((m) => m.status === "warning").length,
     error: allModels.filter((m) => m.status === "error").length,
+    offline: allModels.filter((m) => m.status === "offline").length,
   };
 
   return (
@@ -101,6 +236,10 @@ export default function ModelsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div>
             <h1 className="text-2xl font-semibold text-foreground">Models</h1>
+            <span className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary ring-1 ring-primary/20">
+              <Box className="h-3 w-3" />
+              {stats.total} models
+            </span>
             <p className="mt-1 text-sm text-muted-foreground">
               Manage and monitor your AI models
             </p>
@@ -111,49 +250,75 @@ export default function ModelsPage() {
           </Button>
         </div>
 
-        {/* Stats Cards */}
+        {/* KPI Panels */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
-          <Card className="bg-card border-border">
+          <Card
+            className="bg-card border-border cursor-pointer hover:bg-accent/30 transition-colors"
+            onClick={() => setStatusFilter("running")}
+          >
             <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Models</p>
-                  <p className="text-2xl font-bold text-foreground">{stats.total}</p>
-                </div>
-                <Box className="h-8 w-8 text-muted-foreground" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-card border-border cursor-pointer hover:bg-accent/30 transition-colors" onClick={() => setStatusFilter("running")}>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
+              <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-sm text-muted-foreground">Running</p>
-                  <p className="text-2xl font-bold text-emerald-500">{stats.running}</p>
+                  <p className="text-3xl font-bold text-emerald-500">
+                    {stats.running}
+                  </p>
                 </div>
-                <CheckCircle2 className="h-8 w-8 text-emerald-500" />
+                <CheckCircle2 className="h-8 w-8 text-emerald-500 drop-shadow-[0_0_8px_currentColor]" />
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-card border-border cursor-pointer hover:bg-accent/30 transition-colors" onClick={() => setStatusFilter("stopped")}>
+          <Card
+            className="bg-card border-border cursor-pointer hover:bg-accent/30 transition-colors"
+            onClick={() => setStatusFilter("error")}
+          >
             <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
+              <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-sm text-muted-foreground">Stopped</p>
-                  <p className="text-2xl font-bold text-muted-foreground">{stats.stopped}</p>
+                  <p className="text-sm text-muted-foreground">Error</p>
+                  <p className="text-3xl font-bold text-amber-500">
+                    {stats.error}
+                  </p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Deployment failures (e.g., missing dependencies)
+                  </p>
                 </div>
-                <XCircle className="h-8 w-8 text-muted-foreground" />
+                <AlertTriangle className="h-8 w-8 text-amber-500 drop-shadow-[0_0_8px_currentColor]" />
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-card border-border cursor-pointer hover:bg-accent/30 transition-colors" onClick={() => setStatusFilter("error")}>
+          <Card
+            className="bg-card border-border cursor-pointer hover:bg-accent/30 transition-colors"
+            onClick={() => setStatusFilter("warning")}
+          >
             <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
+              <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-sm text-muted-foreground">Errors</p>
-                  <p className="text-2xl font-bold text-amber-500">{stats.error}</p>
+                  <p className="text-sm text-muted-foreground">Warning</p>
+                  <p className="text-3xl font-bold text-amber-300">
+                    {stats.warning}
+                  </p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Production issues (e.g., latency, data drift)
+                  </p>
                 </div>
-                <AlertTriangle className="h-8 w-8 text-amber-500" />
+                <AlertTriangle className="h-8 w-8 text-amber-300 drop-shadow-[0_0_8px_currentColor]" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card
+            className="bg-card border-border cursor-pointer hover:bg-accent/30 transition-colors"
+            onClick={() => setStatusFilter("offline")}
+          >
+            <CardContent className="pt-6">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-sm text-muted-foreground">Offline</p>
+                  <p className="text-3xl font-bold text-zinc-500">
+                    {stats.offline}
+                  </p>
+                </div>
+                <XCircle className="h-8 w-8 text-zinc-500 drop-shadow-[0_0_8px_currentColor]" />
               </div>
             </CardContent>
           </Card>
@@ -178,13 +343,16 @@ export default function ModelsPage() {
               {/* Status Filter */}
               <select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
+                onChange={(e) =>
+                  setStatusFilter(e.target.value as typeof statusFilter)
+                }
                 className="h-10 rounded-md border border-input bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 <option value="all">All Status</option>
                 <option value="running">Running</option>
-                <option value="stopped">Stopped</option>
+                <option value="warning">Warning</option>
                 <option value="error">Error</option>
+                <option value="offline">Offline</option>
               </select>
 
               {/* Workspace Filter */}
@@ -224,6 +392,9 @@ export default function ModelsPage() {
                       Status
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Status Details
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Accuracy
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -239,9 +410,15 @@ export default function ModelsPage() {
                 </thead>
                 <tbody className="divide-y divide-border">
                   {filteredModels.map((model) => (
-                    <tr key={model.id} className="hover:bg-accent/30 transition-colors">
+                    <tr
+                      key={model.id}
+                      className="hover:bg-accent/30 transition-colors"
+                    >
                       <td className="px-4 py-3">
-                        <Link href={`/models/${model.id}`} className="flex items-center gap-3">
+                        <Link
+                          href={`/models/${model.id}`}
+                          className="flex items-center gap-3"
+                        >
                           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-muted">
                             <Box className="h-4 w-4 text-muted-foreground" />
                           </div>
@@ -257,10 +434,29 @@ export default function ModelsPage() {
                         {model.type}
                       </td>
                       <td className="px-4 py-3">
-                        <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusBadge(model.status)}`}>
+                        <span
+                          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusBadge(model.status)}`}
+                        >
                           {getStatusIcon(model.status)}
                           <span className="capitalize">{model.status}</span>
                         </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm">
+                        {model.statusDetails ? (
+                          <span
+                            className={
+                              model.status === "error"
+                                ? "text-amber-500"
+                                : model.status === "warning"
+                                  ? "text-amber-300"
+                                  : "text-muted-foreground"
+                            }
+                          >
+                            {model.statusDetails}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-sm font-medium text-foreground">
                         {model.accuracy}
@@ -295,7 +491,9 @@ export default function ModelsPage() {
                               <DropdownMenuItem>View Details</DropdownMenuItem>
                               <DropdownMenuItem>Edit</DropdownMenuItem>
                               <DropdownMenuItem>Duplicate</DropdownMenuItem>
-                              <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                              <DropdownMenuItem className="text-destructive">
+                                Delete
+                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
@@ -309,8 +507,12 @@ export default function ModelsPage() {
             {filteredModels.length === 0 && (
               <div className="flex flex-col items-center justify-center py-12">
                 <Box className="h-12 w-12 text-muted-foreground mb-4" />
-                <p className="text-sm font-medium text-foreground">No models found</p>
-                <p className="text-sm text-muted-foreground">Try adjusting your search or filters</p>
+                <p className="text-sm font-medium text-foreground">
+                  No models found
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Try adjusting your search or filters
+                </p>
               </div>
             )}
           </CardContent>
