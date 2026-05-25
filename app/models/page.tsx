@@ -3,21 +3,21 @@
 import { useState } from "react";
 import Link from "next/link";
 import { AppLayout } from "@/components/app-layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Box,
   Search,
-  Filter,
   Plus,
   Play,
   Pause,
   RefreshCw,
   MoreVertical,
   CheckCircle2,
-  AlertTriangle,
   XCircle,
   ArrowUpDown,
+  ServerCrash,
+  Siren,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -26,12 +26,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+type ModelStatus = "running" | "error" | "warning" | "alert" | "offline";
+
 interface Model {
   id: string;
   name: string;
   workspace: string;
   workspaceId: string;
-  status: "running" | "warning" | "error" | "offline";
+  status: ModelStatus;
   statusDetails?: string;
   accuracy: string;
   lastTrained: string;
@@ -68,7 +70,7 @@ const allModels: Model[] = [
     workspace: "TechFlow Inc",
     workspaceId: "2",
     status: "error",
-    statusDetails: "Deployment: Failed (missing input assets)",
+    statusDetails: "Deployment Failure: Missing input assets",
     accuracy: "87.5%",
     lastTrained: "3 days ago",
     lastRun: "12 min ago",
@@ -87,15 +89,15 @@ const allModels: Model[] = [
   },
   {
     id: "5",
-    name: "Energy Optimizer",
-    workspace: "DataSense Ltd",
-    workspaceId: "3",
+    name: "Latency Monitor",
+    workspace: "Acme Corporation",
+    workspaceId: "1",
     status: "warning",
-    statusDetails: "Production: High Latency alert",
+    statusDetails: "Usage Warning: Latency exceeding normal threshold",
     accuracy: "89.3%",
     lastTrained: "2 weeks ago",
     lastRun: "1 hour ago",
-    type: "Optimization",
+    type: "Time Series",
   },
   {
     id: "6",
@@ -143,26 +145,27 @@ const allModels: Model[] = [
   },
   {
     id: "10",
-    name: "Data Classifier",
-    workspace: "DataSense Ltd",
-    workspaceId: "3",
-    status: "warning",
-    statusDetails: "Production: Data drift detected",
+    name: "Data Drifter",
+    workspace: "Globex",
+    workspaceId: "4",
+    status: "alert",
+    statusDetails: "Usage Alert: Critical data drift detected",
     accuracy: "92.4%",
     lastTrained: "1 month ago",
     lastRun: "2 days ago",
-    type: "Classification",
+    type: "Regression",
   },
   {
     id: "11",
-    name: "Compression AI",
+    name: "Energy Optimizer",
     workspace: "DataSense Ltd",
     workspaceId: "3",
-    status: "running",
-    accuracy: "94.8%",
-    lastTrained: "1 week ago",
-    lastRun: "15 min ago",
-    type: "Compression",
+    status: "warning",
+    statusDetails: "Usage Warning: Prediction accuracy degraded",
+    accuracy: "89.7%",
+    lastTrained: "2 weeks ago",
+    lastRun: "30 min ago",
+    type: "Optimization",
   },
   {
     id: "12",
@@ -175,13 +178,24 @@ const allModels: Model[] = [
     lastRun: "3 hours ago",
     type: "Prediction",
   },
+  {
+    id: "13",
+    name: "Compression AI",
+    workspace: "DataSense Ltd",
+    workspaceId: "3",
+    status: "running",
+    accuracy: "94.8%",
+    lastTrained: "1 week ago",
+    lastRun: "15 min ago",
+    type: "Compression",
+  },
 ];
+
+type StatusFilter = "all" | ModelStatus;
 
 export default function ModelsPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<
-    "all" | "running" | "warning" | "error" | "offline"
-  >("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("error");
   const [workspaceFilter, setWorkspaceFilter] = useState<string>("all");
 
   const filteredModels = allModels.filter((model) => {
@@ -195,39 +209,126 @@ export default function ModelsPage() {
     return matchesSearch && matchesStatus && matchesWorkspace;
   });
 
-  const getStatusIcon = (status: Model["status"]) => {
+  const getStatusIcon = (status: ModelStatus) => {
     switch (status) {
       case "running":
         return <CheckCircle2 className="h-4 w-4 text-emerald-500" />;
-      case "warning":
-        return <AlertTriangle className="h-4 w-4 text-amber-300" />;
       case "error":
-        return <AlertTriangle className="h-4 w-4 text-amber-500" />;
+        return <ServerCrash className="h-4 w-4 text-orange-500" />;
+      case "warning":
+        return <Siren className="h-4 w-4 text-yellow-400" />;
+      case "alert":
+        return <Siren className="h-4 w-4 text-red-500" />;
       case "offline":
         return <XCircle className="h-4 w-4 text-zinc-500" />;
     }
   };
 
-  const getStatusBadge = (status: Model["status"]) => {
+  const getStatusBadge = (status: ModelStatus) => {
     switch (status) {
       case "running":
-        return "bg-emerald-500/10 text-emerald-500";
-      case "warning":
-        return "bg-amber-300/10 text-amber-300";
+        return "bg-emerald-500/10 text-emerald-500 ring-1 ring-emerald-500/20";
       case "error":
-        return "bg-amber-500/10 text-amber-500";
+        return "bg-orange-500/10 text-orange-500 ring-1 ring-orange-500/20";
+      case "warning":
+        return "bg-yellow-400/10 text-yellow-400 ring-1 ring-yellow-400/20";
+      case "alert":
+        return "bg-red-500/10 text-red-500 ring-1 ring-red-500/20";
       case "offline":
-        return "bg-zinc-500/10 text-zinc-500";
+        return "bg-zinc-500/10 text-zinc-500 ring-1 ring-zinc-500/20";
+    }
+  };
+
+  const getStatusLabel = (status: ModelStatus) => {
+    switch (status) {
+      case "running":
+        return "Running";
+      case "error":
+        return "Error";
+      case "warning":
+        return "Warning";
+      case "alert":
+        return "Alert";
+      case "offline":
+        return "Offline";
+    }
+  };
+
+  const getStatusDetailColor = (status: ModelStatus) => {
+    switch (status) {
+      case "error":
+        return "text-orange-500";
+      case "warning":
+        return "text-yellow-400";
+      case "alert":
+        return "text-red-500";
+      default:
+        return "text-muted-foreground";
     }
   };
 
   const stats = {
     total: allModels.length,
     running: allModels.filter((m) => m.status === "running").length,
-    warning: allModels.filter((m) => m.status === "warning").length,
     error: allModels.filter((m) => m.status === "error").length,
+    warning: allModels.filter((m) => m.status === "warning").length,
+    alert: allModels.filter((m) => m.status === "alert").length,
     offline: allModels.filter((m) => m.status === "offline").length,
   };
+
+  const kpis: {
+    key: StatusFilter;
+    label: string;
+    value: number;
+    color: string;
+    bg: string;
+    Icon: typeof CheckCircle2;
+    sub?: string;
+  }[] = [
+    {
+      key: "running",
+      label: "Running",
+      value: stats.running,
+      color: "text-emerald-500",
+      bg: "bg-emerald-500/5",
+      Icon: CheckCircle2,
+    },
+    {
+      key: "error",
+      label: "Error (Deployment)",
+      value: stats.error,
+      color: "text-orange-500",
+      bg: "bg-orange-500/5",
+      Icon: ServerCrash,
+      sub: "Deployment failures (e.g., config error, broken build)",
+    },
+    {
+      key: "warning",
+      label: "Alarm — Warning (Usage)",
+      value: stats.warning,
+      color: "text-yellow-400",
+      bg: "bg-yellow-400/5",
+      Icon: Siren,
+      sub: "Usage warnings (e.g., high average latency)",
+    },
+    {
+      key: "alert",
+      label: "Alarm — Alert (Usage)",
+      value: stats.alert,
+      color: "text-red-500",
+      bg: "bg-red-500/5",
+      Icon: Siren,
+      sub: "Usage alerts (e.g., critical data drift, prediction failure)",
+    },
+    {
+      key: "offline",
+      label: "Offline",
+      value: stats.offline,
+      color: "text-zinc-500",
+      bg: "bg-zinc-500/5",
+      Icon: XCircle,
+    },
+  ];
 
   return (
     <AppLayout>
@@ -251,77 +352,51 @@ export default function ModelsPage() {
         </div>
 
         {/* KPI Panels */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
-          <Card
-            className="bg-card border-border cursor-pointer hover:bg-accent/30 transition-colors"
-            onClick={() => setStatusFilter("running")}
-          >
-            <CardContent className="pt-6">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-sm text-muted-foreground">Running</p>
-                  <p className="text-3xl font-bold text-emerald-500">
-                    {stats.running}
-                  </p>
-                </div>
-                <CheckCircle2 className="h-8 w-8 text-emerald-500 drop-shadow-[0_0_8px_currentColor]" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card
-            className="bg-card border-border cursor-pointer hover:bg-accent/30 transition-colors"
-            onClick={() => setStatusFilter("error")}
-          >
-            <CardContent className="pt-6">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-sm text-muted-foreground">Error</p>
-                  <p className="text-3xl font-bold text-amber-500">
-                    {stats.error}
-                  </p>
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    Deployment failures (e.g., missing dependencies)
-                  </p>
-                </div>
-                <AlertTriangle className="h-8 w-8 text-amber-500 drop-shadow-[0_0_8px_currentColor]" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card
-            className="bg-card border-border cursor-pointer hover:bg-accent/30 transition-colors"
-            onClick={() => setStatusFilter("warning")}
-          >
-            <CardContent className="pt-6">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-sm text-muted-foreground">Warning</p>
-                  <p className="text-3xl font-bold text-amber-300">
-                    {stats.warning}
-                  </p>
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    Production issues (e.g., latency, data drift)
-                  </p>
-                </div>
-                <AlertTriangle className="h-8 w-8 text-amber-300 drop-shadow-[0_0_8px_currentColor]" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card
-            className="bg-card border-border cursor-pointer hover:bg-accent/30 transition-colors"
-            onClick={() => setStatusFilter("offline")}
-          >
-            <CardContent className="pt-6">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-sm text-muted-foreground">Offline</p>
-                  <p className="text-3xl font-bold text-zinc-500">
-                    {stats.offline}
-                  </p>
-                </div>
-                <XCircle className="h-8 w-8 text-zinc-500 drop-shadow-[0_0_8px_currentColor]" />
-              </div>
-            </CardContent>
-          </Card>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-6">
+          {kpis.map(({ key, label, value, color, bg, Icon, sub }) => {
+            const active = statusFilter === key;
+            return (
+              <Card
+                key={key}
+                onClick={() => setStatusFilter(active ? "all" : key)}
+                className={`relative overflow-hidden bg-card border-border cursor-pointer transition-all hover:border-foreground/20 ${
+                  active ? "ring-2 ring-offset-2 ring-offset-background" : ""
+                }`}
+                style={
+                  active
+                    ? {
+                        boxShadow: "0 0 0 1px rgba(255,255,255,0.04)",
+                      }
+                    : undefined
+                }
+              >
+                <div
+                  className={`absolute inset-0 ${bg} pointer-events-none`}
+                  aria-hidden
+                />
+                <CardContent className="pt-6 relative">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-xs uppercase tracking-wider text-muted-foreground truncate">
+                        {label}
+                      </p>
+                      <p className={`mt-1 text-3xl font-bold ${color}`}>
+                        {value}
+                      </p>
+                    </div>
+                    <Icon
+                      className={`h-8 w-8 shrink-0 ${color} drop-shadow-[0_0_10px_currentColor]`}
+                    />
+                  </div>
+                  {sub && (
+                    <p className="mt-3 text-xs leading-snug text-muted-foreground">
+                      {sub}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
         {/* Filters */}
@@ -344,14 +419,15 @@ export default function ModelsPage() {
               <select
                 value={statusFilter}
                 onChange={(e) =>
-                  setStatusFilter(e.target.value as typeof statusFilter)
+                  setStatusFilter(e.target.value as StatusFilter)
                 }
                 className="h-10 rounded-md border border-input bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 <option value="all">All Status</option>
-                <option value="running">Running</option>
-                <option value="warning">Warning</option>
                 <option value="error">Error</option>
+                <option value="warning">Alarm — Warning</option>
+                <option value="alert">Alarm — Alert</option>
+                <option value="running">Running</option>
                 <option value="offline">Offline</option>
               </select>
 
@@ -365,6 +441,7 @@ export default function ModelsPage() {
                 <option value="1">Acme Corporation</option>
                 <option value="2">TechFlow Inc</option>
                 <option value="3">DataSense Ltd</option>
+                <option value="4">Globex</option>
               </select>
             </div>
           </CardContent>
@@ -438,20 +515,12 @@ export default function ModelsPage() {
                           className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusBadge(model.status)}`}
                         >
                           {getStatusIcon(model.status)}
-                          <span className="capitalize">{model.status}</span>
+                          <span>{getStatusLabel(model.status)}</span>
                         </span>
                       </td>
                       <td className="px-4 py-3 text-sm">
                         {model.statusDetails ? (
-                          <span
-                            className={
-                              model.status === "error"
-                                ? "text-amber-500"
-                                : model.status === "warning"
-                                  ? "text-amber-300"
-                                  : "text-muted-foreground"
-                            }
-                          >
+                          <span className={getStatusDetailColor(model.status)}>
                             {model.statusDetails}
                           </span>
                         ) : (
